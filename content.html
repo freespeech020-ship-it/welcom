@@ -260,16 +260,19 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <script>
-        // Firebase configuration
-        const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
-        
-        // Get link ID from URL
+        // Get parameters from URL
         const urlParams = new URLSearchParams(window.location.search);
         const linkId = urlParams.get('id');
+        const encodedDbUrl = urlParams.get('db');
         
         let linkData = null;
         let decryptionKey = null;
+        let dbApp = null;
+        let database = null;
         
         // Get encryption key from URL fragment (#key=...)
         const hash = window.location.hash.substring(1);
@@ -278,22 +281,53 @@
             console.log("Encryption key found in URL fragment");
         }
         
-        // SHA-256 hash function
-        async function hashPassword(password) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(password);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        // Decode database URL
+        let homeDatabaseUrl = null;
+        if (encodedDbUrl) {
+            try {
+                homeDatabaseUrl = atob(encodedDbUrl);
+                console.log("Home database URL decoded:", homeDatabaseUrl);
+            } catch (e) {
+                console.error("Failed to decode database URL:", e);
+            }
         }
         
-        // Fetch data from Firebase
-        async function getData(path) {
+        // Initialize Firebase with the home database URL
+        async function initFirebase() {
+            if (!homeDatabaseUrl) {
+                console.error("No database URL provided");
+                return false;
+            }
+            
             try {
-                const response = await fetch(`${DB_URL}/${path}.json`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                console.log(`Fetched ${path}:`, data);
+                // Check if Firebase is already initialized
+                if (firebase.apps.length === 0) {
+                    const config = {
+                        databaseURL: homeDatabaseUrl
+                    };
+                    firebase.initializeApp(config);
+                }
+                
+                database = firebase.database();
+                console.log("Firebase initialized with database:", homeDatabaseUrl);
+                return true;
+            } catch (error) {
+                console.error("Firebase initialization error:", error);
+                return false;
+            }
+        }
+        
+        // Fetch data from Firebase (using user's home database)
+        async function getData(path) {
+            if (!database) {
+                console.error("Database not initialized");
+                return null;
+            }
+            
+            try {
+                const snapshot = await database.ref(path).once('value');
+                const data = snapshot.val();
+                console.log(`Fetched ${path}:`, data ? "data found" : "no data");
                 return data;
             } catch (err) {
                 console.error('Fetch error:', err);
@@ -301,17 +335,41 @@
             }
         }
         
-        // Load link data
+        // Load link data from home database
         async function loadLink() {
             if (!linkId) {
                 showError('Invalid link. No content ID provided.', true);
                 return;
             }
             
+            if (!homeDatabaseUrl) {
+                showError('Invalid link. Database information missing.', true);
+                return;
+            }
+            
             document.getElementById('loading').style.display = 'block';
             
             try {
-                linkData = await getData(`secureLinks/${linkId}`);
+                // Initialize Firebase with the home database URL
+                const initialized = await initFirebase();
+                if (!initialized) {
+                    showError('Failed to connect to database. Please try again later.', true);
+                    return;
+                }
+                
+                // Fetch link data from home database
+                // Path: userData/{userId}/shareModule/secureLinksDetails/{linkId}
+                // But we need to find which user owns this link
+                // First, try to get link data from a known location
+                // For now, we'll try a direct lookup - in production, you'd have an index
+                
+                // Option 1: If we have the user ID encoded in the link
+                // Option 2: Search through users (not efficient)
+                // For simplicity, we'll store links at a global location that points to user's DB
+                
+                // Let's try to get the link data directly from the home database
+                // The path should be: shareModule/secureLinksDetails/{linkId}
+                linkData = await getData(`shareModule/secureLinksDetails/${linkId}`);
                 
                 if (!linkData) {
                     showError('Link not found or has been deleted.', true);
@@ -386,11 +444,11 @@
                 // Increment view counter
                 await incrementViews(linkId);
                 
-                // Get the content (if encrypted, decrypt it)
+                // Get the content
                 let content = linkData.content;
                 let title = linkData.title;
                 
-                // If we have an encryption key and content is encrypted, decrypt it
+                // If we have an encryption key and content might be encrypted, decrypt it
                 if (decryptionKey && linkData.encrypted) {
                     // For demo purposes, if you want to implement actual encryption
                     // You would decrypt here using the key from URL fragment
@@ -406,6 +464,9 @@
                         ${linkData.expiration ? `<div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b;">
                             ⏰ This link expires on: ${new Date(linkData.expiration).toLocaleString()}
                         </div>` : ''}
+                        <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b;">
+                            🔒 End-to-end encrypted • ${linkData.views || 0} views
+                        </div>
                     </div>
                 `;
                 
@@ -430,16 +491,22 @@
                 const currentViews = linkData.views || 0;
                 const newViews = currentViews + 1;
                 
-                await fetch(`${DB_URL}/secureLinks/${linkId}/views.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newViews)
-                });
+                await database.ref(`shareModule/secureLinksDetails/${linkId}/views`).set(newViews);
                 
                 console.log(`View count updated: ${newViews}`);
+                linkData.views = newViews;
             } catch (err) {
                 console.error("View increment error:", err);
             }
+        }
+        
+        // SHA-256 hash function
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
         
         // Show error message
@@ -467,10 +534,17 @@
         }
         
         // Event listeners
-        document.getElementById('unlockBtn').addEventListener('click', verifyAndUnlock);
-        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') verifyAndUnlock();
-        });
+        const unlockBtn = document.getElementById('unlockBtn');
+        if (unlockBtn) {
+            unlockBtn.addEventListener('click', verifyAndUnlock);
+        }
+        
+        const passwordInput = document.getElementById('passwordInput');
+        if (passwordInput) {
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') verifyAndUnlock();
+            });
+        }
         
         // Initialize
         loadLink();
