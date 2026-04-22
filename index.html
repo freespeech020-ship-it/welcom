@@ -2,12 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>✨ Welcome Demo | Simple & Elegant</title>
-    <!-- Google Fonts for clean typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <!-- Font Awesome 6 (free icons) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Content Vault - Welcome</title>
     <style>
         * {
             margin: 0;
@@ -16,442 +12,427 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fe 0%, #e9eefa 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            color: #1e293b;
         }
 
-        /* main card container */
-        .welcome-card {
-            max-width: 750px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(0px);
-            border-radius: 2.5rem;
-            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 8px 18px rgba(0, 0, 0, 0.05);
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Content Grid */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 20px;
             overflow: hidden;
-            transition: transform 0.25s ease, box-shadow 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeIn 0.6s ease-out;
         }
 
-        .welcome-card:hover {
+        .content-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
         }
 
-        /* decorative header with gradient and wave illusion */
-        .hero-gradient {
-            background: linear-gradient(120deg, #3b82f6, #a855f7, #ec489a);
-            padding: 2.8rem 2rem 2rem 2rem;
-            text-align: center;
-            position: relative;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            padding: 25px;
         }
 
-        .hero-gradient::after {
-            content: "✨";
-            font-size: 4rem;
-            position: absolute;
-            bottom: -20px;
-            left: 20px;
-            opacity: 0.2;
-            pointer-events: none;
-            transform: rotate(-10deg);
+        .card-header h3 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
         }
 
-        .hero-gradient::before {
-            content: "🌟";
-            font-size: 3.5rem;
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            opacity: 0.25;
-            pointer-events: none;
-        }
-
-        .avatar-icon {
-            font-size: 4.2rem;
-            background: rgba(255,255,255,0.2);
-            width: 90px;
-            height: 90px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            backdrop-filter: blur(2px);
-            margin-bottom: 1rem;
-            border: 2px solid rgba(255,255,255,0.5);
-            box-shadow: 0 10px 15px -5px rgba(0,0,0,0.2);
-        }
-
-        h1 {
-            font-size: 2.4rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .greeting-sub {
-            font-size: 1.05rem;
-            opacity: 0.92;
-            font-weight: 400;
-            background: rgba(255,255,255,0.15);
-            display: inline-block;
-            padding: 0.2rem 1rem;
-            border-radius: 40px;
-            backdrop-filter: blur(4px);
-        }
-
-        /* main content area */
-        .content {
-            padding: 2rem 2rem 2rem 2rem;
-        }
-
-        .welcome-message {
-            background: #f8fafc;
-            border-radius: 1.8rem;
-            padding: 1.4rem 1.8rem;
-            margin-bottom: 2rem;
-            border-left: 5px solid #3b82f6;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
-        }
-
-        .welcome-message p {
-            font-size: 1.1rem;
-            line-height: 1.5;
-            color: #0f172a;
-            font-weight: 450;
-        }
-
-        .highlight {
-            background: linear-gradient(120deg, #e0f2fe, #fff3e0);
-            padding: 0.1rem 0.2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            color: #075985;
-        }
-
-        .info-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.2rem;
-            margin: 2rem 0 1.8rem;
-        }
-
-        .info-card {
-            flex: 1;
-            min-width: 140px;
-            background: white;
-            border-radius: 1.5rem;
-            padding: 1.2rem 0.8rem;
-            text-align: center;
-            transition: all 0.2s;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 5px 12px rgba(0,0,0,0.02);
-        }
-
-        .info-card i {
-            font-size: 2rem;
-            color: #3b82f6;
-            margin-bottom: 0.6rem;
-            display: inline-block;
-        }
-
-        .info-card h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-        }
-
-        .info-card p {
+        .card-header .hint {
             font-size: 0.85rem;
-            color: #475569;
-        }
-
-        .info-card:hover {
-            transform: scale(1.02);
-            border-color: #b9d0f8;
-            background: #ffffff;
-            box-shadow: 0 10px 20px -8px rgba(59,130,246,0.2);
-        }
-
-        .action-area {
-            background: #f1f5f9;
-            border-radius: 1.5rem;
-            padding: 1.4rem 1.5rem;
+            opacity: 0.9;
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-top: 0.8rem;
+            gap: 5px;
         }
 
-        .demo-btn {
-            background: #1e293b;
-            border: none;
-            padding: 0.75rem 1.6rem;
-            border-radius: 2rem;
-            font-weight: 600;
-            font-size: 0.9rem;
+        .card-body {
+            padding: 25px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .unlock-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            font-family: 'Inter', sans-serif;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
         }
 
-        .demo-btn i {
-            font-size: 1rem;
-        }
-
-        .demo-btn:hover {
-            background: #0f172a;
+        .unlock-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 18px -8px #0f172a70;
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
         }
 
-        .click-feedback {
-            font-size: 0.9rem;
-            background: white;
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #2d3a5e;
-            border: 1px solid #cbd5e1;
-            transition: all 0.2s;
+        .content-display {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            display: none;
+            animation: slideIn 0.3s ease-out;
         }
 
-        .click-feedback i {
-            color: #10b981;
+        .content-display.show {
+            display: block;
         }
 
-        footer {
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
             text-align: center;
-            padding: 1rem 1rem 1.5rem;
-            font-size: 0.75rem;
-            color: #5b6e8c;
-            border-top: 1px solid #eef2ff;
-            background: #ffffffc9;
+            padding: 30px;
+            background: rgba(0,0,0,0.1);
+            color: white;
+            margin-top: 40px;
         }
 
-        @media (max-width: 550px) {
-            .hero-gradient {
-                padding: 2rem 1rem 1.8rem;
+        .admin-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .admin-link:hover {
+            background: rgba(0,0,0,0.9);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
             }
-            h1 {
-                font-size: 1.8rem;
-            }
-            .content {
-                padding: 1.5rem;
-            }
-            .info-grid {
-                gap: 0.8rem;
-            }
-            .action-area {
-                flex-direction: column;
-                align-items: stretch;
-                text-align: center;
-            }
-            .demo-btn {
-                justify-content: center;
-            }
-            .click-feedback {
-                justify-content: center;
+            .content-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
+    <div class="hero">
+        <h1>🔐 Secure Content Vault</h1>
+        <p>Protected content with individual passwords • Zero-knowledge encryption</p>
+    </div>
 
-<div class="welcome-card">
-    <div class="hero-gradient">
-        <div class="avatar-icon">
-            <i class="fas fa-smile-wink"></i>
-        </div>
-        <h1>Welcome, Explorer!</h1>
-        <div class="greeting-sub">
-            <i class="fas fa-map-pin"></i> interactive demo · simple & friendly
+    <div class="container">
+        <div class="content-grid" id="contentGrid">
+            <div style="text-align: center; color: white; grid-column: 1/-1; padding: 40px;">
+                <div class="loading" style="width: 40px; height: 40px; border-width: 3px;"></div>
+                <p style="margin-top: 15px;">Loading available content...</p>
+            </div>
         </div>
     </div>
 
-    <div class="content">
-        <div class="welcome-message">
-            <p>
-                👋 Hello there! We're delighted to have you here.  
-                This is a <span class="highlight">clean welcome demo</span> built with HTML, CSS, and a touch of JavaScript.  
-                Explore the cards, click the button, and feel the vibe ✨.
-            </p>
-        </div>
-
-        <div class="info-grid">
-            <div class="info-card">
-                <i class="fas fa-code"></i>
-                <h3>Clean Code</h3>
-                <p>Semantic HTML5 + modern CSS</p>
-            </div>
-            <div class="info-card">
-                <i class="fas fa-palette"></i>
-                <h3>Soft Design</h3>
-                <p>Gradient & smooth shadows</p>
-            </div>
-            <div class="info-card">
-                <i class="fas fa-heart"></i>
-                <h3>Friendly UX</h3>
-                <p>Interactive feedback</p>
-            </div>
-            <div class="info-card">
-                <i class="fas fa-mobile-alt"></i>
-                <h3>Fully Responsive</h3>
-                <p>Looks great on any device</p>
-            </div>
-        </div>
-
-        <div class="action-area">
-            <button id="greetBtn" class="demo-btn">
-                <i class="fas fa-hand-peace"></i> Say welcome
-            </button>
-            <div id="feedbackMsg" class="click-feedback">
-                <i class="fas fa-comment-dots"></i> <span id="feedbackText">Ready for action</span>
-            </div>
-        </div>
+    <div class="footer">
+        <p>🔒 End-to-end encrypted • Your privacy matters</p>
     </div>
-    <footer>
-        <i class="fas fa-star-of-life"></i> simple welcome demo · enjoy the micro-interactions  <i class="fas fa-crown"></i>
-    </footer>
-</div>
 
-<script>
-    // small interactive script to make demo alive
-    (function() {
-        const btn = document.getElementById('greetBtn');
-        const feedbackSpan = document.getElementById('feedbackText');
+    <a href="admin.html" class="admin-link">🔑 Admin Access</a>
+
+    <script>
+        // Firebase configuration
+        const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
         
-        // collection of warm welcome phrases
-        const welcomeMessages = [
-            "🌸 Hello! So glad to see you!",
-            "🚀 Welcome aboard! Let's build something great.",
-            "✨ You're awesome! Thanks for visiting.",
-            "🎉 Hey there! Have a fantastic day!",
-            "💫 Welcome to the demo — simplicity at its best.",
-            "🌟 'Welcome, friend!' — from the dev team.",
-            "🍃 Simple joy, nice to meet you!",
-            "⚡ Click again! Every click brings good vibes."
-        ];
-        
-        let messageIndex = 0;
-        
-        // function to update feedback with a new message and small animation
-        function updateGreeting() {
-            // pick a message (rotate through array for variety)
-            const msg = welcomeMessages[messageIndex % welcomeMessages.length];
-            feedbackSpan.textContent = msg;
-            messageIndex++;
-            
-            // add a micro pop animation on the feedback element
-            const feedbackDiv = document.getElementById('feedbackMsg');
-            feedbackDiv.style.transform = 'scale(1.02)';
-            feedbackDiv.style.transition = 'transform 0.1s ease';
-            setTimeout(() => {
-                feedbackDiv.style.transform = 'scale(1)';
-            }, 150);
-            
-            // also optional: small console greet for devs
-            console.log(`✨ Demo interaction: "${msg}"`);
+        // SHA-256 hash function
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
         
-        // initial random welcome on page load? (optional)
-        // but let's set a nice initial message not from the array
-        feedbackSpan.textContent = "💬 click the button 👈";
-        
-        // attach event listener to the button
-        btn.addEventListener('click', updateGreeting);
-        
-        // bonus: add a small hover effect on cards using minimal js? (already css)
-        // Also extra little dynamic feature: time-based greeting (optional) - but keep simple.
-        // Just for charm, display a live timestamp or not needed. But we can add a small date insight.
-        // we'll add a tiny surprise: show the current hour of day in console? Not intrusive.
-        const currentHour = new Date().getHours();
-        let timeGreet = "";
-        if (currentHour < 12) timeGreet = "Good morning 🌤️";
-        else if (currentHour < 18) timeGreet = "Good afternoon ☀️";
-        else timeGreet = "Good evening 🌙";
-        
-        // slightly personalize the welcome message if we want: add a small data attribute
-        const welcomeMsgDiv = document.querySelector('.welcome-message p');
-        if (welcomeMsgDiv) {
-            // optional: add a subtle time-based note without breaking original text
-            const originalText = welcomeMsgDiv.innerHTML;
-            if (!originalText.includes('time note')) {
-                // but we don't want to overcomplicate, just for smile
-                const timeSpan = document.createElement('span');
-                timeSpan.className = 'highlight';
-                timeSpan.style.fontSize = '0.85rem';
-                timeSpan.style.marginLeft = '6px';
-                // but easier: we can add a small tooltip on the page? Not needed but fine.
+        // Fetch data from Firebase
+        async function getData(path) {
+            try {
+                const response = await fetch(`${DB_URL}/${path}.json`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (err) {
+                console.error('Fetch error:', err);
+                return null;
             }
         }
         
-        // Let's create a little hover effect that shows a dynamic badge in console? no.
-        // But also provide a double-click fun fact on the welcome card
-        const card = document.querySelector('.welcome-card');
-        card.addEventListener('dblclick', function(e) {
-            // Easter egg: change temporary background of hero gradient? or just alert feedback?
-            const feedback = document.getElementById('feedbackText');
-            const originalMsg = feedback.textContent;
-            feedback.textContent = "🎈 Double click magic! You found an easter egg 🥚";
-            setTimeout(() => {
-                if (feedback.textContent === "🎈 Double click magic! You found an easter egg 🥚") {
-                    feedback.textContent = originalMsg !== "🎈 Double click magic! You found an easter egg 🥚" ? originalMsg : "✨ keep exploring!";
-                } else {
-                    // fallback
+        // Get all content items
+        async function getAllContentItems() {
+            const data = await getData('contents');
+            if (!data) return {};
+            return data;
+        }
+        
+        // Verify password for specific content
+        async function verifyContentPassword(contentId, enteredPassword) {
+            const contentData = await getData(`contents/${contentId}`);
+            if (!contentData || !contentData.passwordHash) {
+                throw new Error("Content not found");
+            }
+            
+            const enteredHash = await hashPassword(enteredPassword);
+            if (enteredHash !== contentData.passwordHash) {
+                throw new Error("Incorrect password");
+            }
+            
+            return contentData.content || "(No content available)";
+        }
+        
+        // Render all content cards
+        async function renderContentCards() {
+            const grid = document.getElementById('contentGrid');
+            
+            try {
+                const contents = await getAllContentItems();
+                const contentIds = Object.keys(contents);
+                
+                if (contentIds.length === 0) {
+                    grid.innerHTML = `
+                        <div style="text-align: center; color: white; grid-column: 1/-1; padding: 40px;">
+                            <h3>📭 No content available yet</h3>
+                            <p style="margin-top: 10px;">Check back later for shared content.</p>
+                        </div>
+                    `;
+                    return;
                 }
-            }, 1800);
-            // add a tiny temporary style to card
-            card.style.transition = "all 0.1s";
-            card.style.transform = "scale(0.99)";
-            setTimeout(() => { card.style.transform = ""; }, 150);
-        });
+                
+                grid.innerHTML = '';
+                
+                for (const id of contentIds) {
+                    const item = contents[id];
+                    const card = createCard(id, item.title || 'Untitled', item.hint || 'Enter password to unlock');
+                    grid.appendChild(card);
+                }
+            } catch (err) {
+                console.error('Error loading contents:', err);
+                grid.innerHTML = `
+                    <div style="text-align: center; color: white; grid-column: 1/-1; padding: 40px;">
+                        <h3>⚠️ Error loading content</h3>
+                        <p style="margin-top: 10px;">Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
         
-        // additional "ready" console message for devs
-        console.log("✅ Welcome demo fully loaded | Double-click anywhere on card for easter egg");
-        
-        // Also add a neat trick: when user clicks on any info-card, show a contextual message
-        const infoCards = document.querySelectorAll('.info-card');
-        infoCards.forEach((cardElem, idx) => {
-            cardElem.addEventListener('click', () => {
-                let topic = "";
-                if (idx === 0) topic = "Clean Code";
-                else if (idx === 1) topic = "Soft Design";
-                else if (idx === 2) topic = "Friendly UX";
-                else topic = "Responsive Layout";
-                const feedDiv = document.getElementById('feedbackText');
-                const originalFeedback = feedDiv.textContent;
-                feedDiv.textContent = `🔍 ${topic} — simple & modern approach ✨`;
-                setTimeout(() => {
-                    if (feedDiv.textContent === `🔍 ${topic} — simple & modern approach ✨`) {
-                        // restore only if still that message, else keep new one
-                        if (originalFeedback !== feedDiv.textContent) feedDiv.textContent = originalFeedback;
-                        else feedDiv.textContent = "💡 explore more!";
-                    }
-                }, 1200);
-                // also ripple mini effect on card
-                cardElem.style.transform = "scale(1.02)";
-                setTimeout(() => { cardElem.style.transform = ""; }, 180);
+        // Create HTML card for a content item
+        function createCard(id, title, hint) {
+            const card = document.createElement('div');
+            card.className = 'content-card';
+            card.innerHTML = `
+                <div class="card-header">
+                    <h3>📄 ${escapeHtml(title)}</h3>
+                    <div class="hint">💡 ${escapeHtml(hint)}</div>
+                </div>
+                <div class="card-body">
+                    <input type="password" class="password-input" placeholder="Enter password" data-id="${id}">
+                    <button class="unlock-btn" data-id="${id}">🔓 Unlock Content</button>
+                    <div class="error-msg" data-id="${id}"></div>
+                    <div class="content-display" data-id="${id}"></div>
+                </div>
+            `;
+            
+            // Add event listeners
+            const unlockBtn = card.querySelector('.unlock-btn');
+            const passwordInput = card.querySelector('.password-input');
+            
+            unlockBtn.addEventListener('click', () => handleUnlock(id, card));
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleUnlock(id, card);
             });
-        });
-    })();
-</script>
+            
+            return card;
+        }
+        
+        // Handle unlock attempt
+        async function handleUnlock(contentId, cardElement) {
+            const passwordInput = cardElement.querySelector('.password-input');
+            const errorDiv = cardElement.querySelector('.error-msg');
+            const contentDisplay = cardElement.querySelector('.content-display');
+            const unlockBtn = cardElement.querySelector('.unlock-btn');
+            
+            const password = passwordInput.value.trim();
+            
+            // Clear previous
+            errorDiv.style.display = 'none';
+            errorDiv.innerHTML = '';
+            contentDisplay.classList.remove('show');
+            contentDisplay.innerHTML = '';
+            
+            if (!password) {
+                errorDiv.innerHTML = '⚠️ Please enter a password';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Show loading
+            const originalBtnText = unlockBtn.innerHTML;
+            unlockBtn.innerHTML = 'Unlocking... <span class="loading"></span>';
+            unlockBtn.disabled = true;
+            
+            try {
+                const content = await verifyContentPassword(contentId, password);
+                contentDisplay.innerHTML = `<strong>📄 Content:</strong><br>${escapeHtml(content).replace(/\n/g, '<br>')}`;
+                contentDisplay.classList.add('show');
+                passwordInput.value = ''; // Clear password for security
+                errorDiv.style.display = 'none';
+            } catch (err) {
+                errorDiv.innerHTML = `❌ ${err.message}`;
+                errorDiv.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.focus();
+            } finally {
+                unlockBtn.innerHTML = originalBtnText;
+                unlockBtn.disabled = false;
+            }
+        }
+        
+        // Helper to escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Load all content on page load
+        renderContentCards();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(renderContentCards, 30000);
+    </script>
 </body>
 </html>
