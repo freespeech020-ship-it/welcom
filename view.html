@@ -121,12 +121,16 @@
             box-shadow: 0 10px 20px rgba(59,130,246,0.3);
         }
 
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .content-display {
             background: #f8fafc;
             border-radius: 16px;
             padding: 30px;
             margin-top: 20px;
-            display: none;
             animation: slideIn 0.3s ease-out;
         }
 
@@ -153,6 +157,8 @@
         .content-body {
             line-height: 1.6;
             color: #334155;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         .error-message {
@@ -203,6 +209,16 @@
             font-size: 0.75rem;
             margin-top: 10px;
         }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #1e40af;
+        }
     </style>
 </head>
 <body>
@@ -227,9 +243,8 @@
                 </div>
 
                 <div id="contentSection" style="display: none;">
-                    <div class="content-display" id="contentDisplay">
-                        <div class="content-title" id="contentTitle"></div>
-                        <div class="content-body" id="contentBody"></div>
+                    <div id="contentDisplay">
+                        <!-- Content will be shown here -->
                     </div>
                 </div>
 
@@ -246,15 +261,24 @@
     </div>
 
     <script>
+        // Firebase configuration
         const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
         
         // Get link ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const linkId = urlParams.get('id');
-        const urlKey = window.location.hash.substring(1).split('=')[1];
         
         let linkData = null;
+        let decryptionKey = null;
         
+        // Get encryption key from URL fragment (#key=...)
+        const hash = window.location.hash.substring(1);
+        if (hash && hash.startsWith('key=')) {
+            decryptionKey = hash.substring(4);
+            console.log("Encryption key found in URL fragment");
+        }
+        
+        // SHA-256 hash function
         async function hashPassword(password) {
             const encoder = new TextEncoder();
             const data = encoder.encode(password);
@@ -263,43 +287,44 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
         
+        // Fetch data from Firebase
         async function getData(path) {
-            const response = await fetch(`${DB_URL}/${path}.json`);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return await response.json();
-        }
-        
-        async function incrementViews(linkId) {
-            const link = await getData(`secureLinks/${linkId}`);
-            if (link) {
-                const views = (link.views || 0) + 1;
-                await fetch(`${DB_URL}/secureLinks/${linkId}/views.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(views)
-                });
+            try {
+                const response = await fetch(`${DB_URL}/${path}.json`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                console.log(`Fetched ${path}:`, data);
+                return data;
+            } catch (err) {
+                console.error('Fetch error:', err);
+                return null;
             }
         }
         
+        // Load link data
         async function loadLink() {
             if (!linkId) {
-                showError('Invalid link. No content ID provided.');
+                showError('Invalid link. No content ID provided.', true);
                 return;
             }
+            
+            document.getElementById('loading').style.display = 'block';
             
             try {
                 linkData = await getData(`secureLinks/${linkId}`);
                 
                 if (!linkData) {
-                    showError('Link not found or has been deleted.');
+                    showError('Link not found or has been deleted.', true);
                     return;
                 }
+                
+                console.log("Link data loaded:", linkData);
                 
                 // Check expiration
                 if (linkData.expiration) {
                     const expDate = new Date(linkData.expiration);
                     if (expDate < new Date()) {
-                        showError('This link has expired.');
+                        showError('This link has expired.', true);
                         return;
                     }
                 }
@@ -308,14 +333,21 @@
                 if (!linkData.hasPassword) {
                     // No password required, just show content
                     await displayContent();
+                } else {
+                    // Hide loading, show password form
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('unlockSection').style.display = 'block';
                 }
-                // Otherwise, wait for password input
                 
             } catch (err) {
-                showError(`Error loading content: ${err.message}`);
+                console.error('Load error:', err);
+                showError(`Error loading content: ${err.message}`, true);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
         }
         
+        // Verify password and unlock content
         async function verifyAndUnlock() {
             const password = document.getElementById('passwordInput').value;
             
@@ -329,6 +361,8 @@
             
             try {
                 const enteredHash = await hashPassword(password);
+                console.log("Entered hash:", enteredHash);
+                console.log("Stored hash:", linkData.passwordHash);
                 
                 if (enteredHash === linkData.passwordHash) {
                     await displayContent();
@@ -338,6 +372,7 @@
                     document.getElementById('passwordInput').focus();
                 }
             } catch (err) {
+                console.error("Unlock error:", err);
                 showError(`Error: ${err.message}`);
             } finally {
                 document.getElementById('loading').style.display = 'none';
@@ -345,28 +380,90 @@
             }
         }
         
+        // Display the content
         async function displayContent() {
-            // Increment view counter
-            await incrementViews(linkId);
-            
-            // Display content
-            document.getElementById('contentTitle').textContent = linkData.title;
-            document.getElementById('contentBody').innerHTML = linkData.content.replace(/\n/g, '<br>');
-            
-            document.getElementById('unlockSection').style.display = 'none';
-            document.getElementById('contentSection').style.display = 'block';
-            
-            // Clear password from memory
-            document.getElementById('passwordInput').value = '';
+            try {
+                // Increment view counter
+                await incrementViews(linkId);
+                
+                // Get the content (if encrypted, decrypt it)
+                let content = linkData.content;
+                let title = linkData.title;
+                
+                // If we have an encryption key and content is encrypted, decrypt it
+                if (decryptionKey && linkData.encrypted) {
+                    // For demo purposes, if you want to implement actual encryption
+                    // You would decrypt here using the key from URL fragment
+                    console.log("Content would be decrypted with key:", decryptionKey);
+                }
+                
+                // Create HTML display
+                const contentDisplay = document.getElementById('contentDisplay');
+                contentDisplay.innerHTML = `
+                    <div class="content-display">
+                        <div class="content-title">📄 ${escapeHtml(title)}</div>
+                        <div class="content-body">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
+                        ${linkData.expiration ? `<div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b;">
+                            ⏰ This link expires on: ${new Date(linkData.expiration).toLocaleString()}
+                        </div>` : ''}
+                    </div>
+                `;
+                
+                // Hide unlock section, show content
+                document.getElementById('unlockSection').style.display = 'none';
+                document.getElementById('contentSection').style.display = 'block';
+                
+                // Clear password from memory
+                if (document.getElementById('passwordInput')) {
+                    document.getElementById('passwordInput').value = '';
+                }
+                
+            } catch (err) {
+                console.error("Display error:", err);
+                showError(`Error displaying content: ${err.message}`);
+            }
         }
         
-        function showError(message) {
+        // Increment view counter
+        async function incrementViews(linkId) {
+            try {
+                const currentViews = linkData.views || 0;
+                const newViews = currentViews + 1;
+                
+                await fetch(`${DB_URL}/secureLinks/${linkId}/views.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newViews)
+                });
+                
+                console.log(`View count updated: ${newViews}`);
+            } catch (err) {
+                console.error("View increment error:", err);
+            }
+        }
+        
+        // Show error message
+        function showError(message, isFatal = false) {
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
+            
+            if (isFatal) {
+                document.getElementById('unlockBtn').disabled = true;
+                document.getElementById('passwordInput').disabled = true;
+            }
+            
             setTimeout(() => {
                 errorDiv.style.display = 'none';
             }, 5000);
+        }
+        
+        // Helper to escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
         // Event listeners
@@ -377,6 +474,11 @@
         
         // Initialize
         loadLink();
+        
+        // Show info if no encryption key in URL
+        if (!decryptionKey && window.location.hash === '') {
+            console.log("No encryption key found in URL fragment");
+        }
     </script>
 </body>
 </html>
