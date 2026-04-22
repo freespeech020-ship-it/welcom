@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Content - Proton Drive Style</title>
+    <title>Secure Content - PriBox Share</title>
     <style>
         * {
             margin: 0;
@@ -46,7 +46,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            background: linear-gradient(135deg, #219EBC 0%, #8ECAE6 100%);
             color: white;
             padding: 40px;
             text-align: center;
@@ -98,14 +98,14 @@
 
         input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+            border-color: #219EBC;
+            box-shadow: 0 0 0 3px rgba(33, 158, 188, 0.1);
         }
 
         button {
             width: 100%;
             padding: 14px;
-            background: #3b82f6;
+            background: #219EBC;
             color: white;
             border: none;
             border-radius: 12px;
@@ -116,9 +116,9 @@
         }
 
         button:hover {
-            background: #2563eb;
+            background: #1a7a94;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(59,130,246,0.3);
+            box-shadow: 0 10px 20px rgba(33, 158, 188, 0.3);
         }
 
         button:disabled {
@@ -171,6 +171,16 @@
             display: none;
         }
 
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
         .loading {
             text-align: center;
             margin-top: 20px;
@@ -179,7 +189,7 @@
 
         .spinner {
             border: 3px solid #f3f3f3;
-            border-top: 3px solid #3b82f6;
+            border-top: 3px solid #219EBC;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -198,6 +208,7 @@
             background: #f8fafc;
             color: #64748b;
             font-size: 0.85rem;
+            border-top: 1px solid #e2e8f0;
         }
 
         .security-badge {
@@ -207,17 +218,70 @@
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.75rem;
-            margin-top: 10px;
+            margin-left: 10px;
         }
 
         .info-box {
             background: #dbeafe;
-            border-left: 4px solid #3b82f6;
+            border-left: 4px solid #219EBC;
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 20px;
             font-size: 0.9rem;
             color: #1e40af;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #92400e;
+        }
+
+        .expired-badge {
+            display: inline-block;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-left: 10px;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .secure-card {
+                background: #1e293b;
+            }
+            .content-display {
+                background: #0f172a;
+            }
+            .content-title {
+                color: #f1f5f9;
+                border-bottom-color: #334155;
+            }
+            .content-body {
+                color: #cbd5e1;
+            }
+            label {
+                color: #f1f5f9;
+            }
+            .footer {
+                background: #0f172a;
+                color: #94a3b8;
+                border-top-color: #334155;
+            }
+            .info-box {
+                background: #1e293b;
+                color: #93c5fd;
+            }
+            .warning-box {
+                background: #422006;
+                color: #fcd34d;
+            }
         }
     </style>
 </head>
@@ -225,8 +289,8 @@
     <div class="container">
         <div class="secure-card">
             <div class="header">
-                <h1>🔒 Secure Content</h1>
-                <p>Zero-knowledge encryption • Your data is private</p>
+                <h1>🔒 PriBox Secure Content</h1>
+                <p>Zero-knowledge encryption • Your data stays private</p>
             </div>
 
             <div class="content-area">
@@ -255,7 +319,7 @@
 
             <div class="footer">
                 <span>🔒 End-to-end encrypted</span>
-                <span class="security-badge">Proton Drive Style</span>
+                <span class="security-badge">Powered by PriBox</span>
             </div>
         </div>
     </div>
@@ -264,9 +328,10 @@
         // Firebase configuration
         const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
         
-        // Get link ID from URL
+        // Get parameters from URL
         const urlParams = new URLSearchParams(window.location.search);
         const linkId = urlParams.get('id');
+        const encodedUser = urlParams.get('user');
         
         let linkData = null;
         let decryptionKey = null;
@@ -278,6 +343,12 @@
             console.log("Encryption key found in URL fragment");
         }
         
+        // Decode email from encoded format (reverse of encodeEmail)
+        function decodeEmail(encodedEmail) {
+            if (!encodedEmail) return null;
+            return encodedEmail.replace(/-at-/g, '@').replace(/,/g, '.');
+        }
+        
         // SHA-256 hash function
         async function hashPassword(password) {
             const encoder = new TextEncoder();
@@ -287,7 +358,23 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
         
-        // Fetch data from Firebase
+        // Simple XOR decryption (for demo purposes - in production use AES-GCM)
+        function simpleDecrypt(encryptedText, key) {
+            if (!encryptedText || !key) return encryptedText;
+            try {
+                let result = '';
+                for (let i = 0; i < encryptedText.length; i++) {
+                    const charCode = encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+                    result += String.fromCharCode(charCode);
+                }
+                return result;
+            } catch (e) {
+                console.error("Decryption error:", e);
+                return encryptedText;
+            }
+        }
+        
+        // Fetch data from Firebase (single-node structure)
         async function getData(path) {
             try {
                 const response = await fetch(`${DB_URL}/${path}.json`);
@@ -301,17 +388,42 @@
             }
         }
         
-        // Load link data
+        // Update view count in the single-node structure
+        async function incrementViews(encodedUser, linkId, currentViews) {
+            try {
+                const newViews = (currentViews || 0) + 1;
+                const path = `shareLinks/${encodedUser}/${linkId}/views`;
+                await fetch(`${DB_URL}/${path}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newViews)
+                });
+                console.log(`View count updated: ${newViews}`);
+                return newViews;
+            } catch (err) {
+                console.error("View increment error:", err);
+                return currentViews;
+            }
+        }
+        
+        // Load link data from single-node structure
         async function loadLink() {
             if (!linkId) {
                 showError('Invalid link. No content ID provided.', true);
                 return;
             }
             
+            if (!encodedUser) {
+                showError('Invalid link. Missing user information.', true);
+                return;
+            }
+            
             document.getElementById('loading').style.display = 'block';
             
             try {
-                linkData = await getData(`secureLinks/${linkId}`);
+                // Fetch from single-node structure: shareLinks/{user}/{linkId}
+                const path = `shareLinks/${encodedUser}/${linkId}`;
+                linkData = await getData(path);
                 
                 if (!linkData) {
                     showError('Link not found or has been deleted.', true);
@@ -326,6 +438,20 @@
                     if (expDate < new Date()) {
                         showError('This link has expired.', true);
                         return;
+                    }
+                }
+                
+                // Decrypt content if encryption key is available
+                if (decryptionKey && linkData.content) {
+                    try {
+                        // Attempt to decrypt content
+                        const decryptedContent = simpleDecrypt(linkData.content, decryptionKey);
+                        if (decryptedContent && decryptedContent !== linkData.content) {
+                            linkData.content = decryptedContent;
+                            console.log("Content decrypted successfully");
+                        }
+                    } catch (e) {
+                        console.warn("Decryption failed, using original content:", e);
                     }
                 }
                 
@@ -361,8 +487,7 @@
             
             try {
                 const enteredHash = await hashPassword(password);
-                console.log("Entered hash:", enteredHash);
-                console.log("Stored hash:", linkData.passwordHash);
+                console.log("Verifying password...");
                 
                 if (enteredHash === linkData.passwordHash) {
                     await displayContent();
@@ -383,29 +508,29 @@
         // Display the content
         async function displayContent() {
             try {
-                // Increment view counter
-                await incrementViews(linkId);
+                // Increment view counter in single-node structure
+                await incrementViews(encodedUser, linkId, linkData.views);
                 
-                // Get the content (if encrypted, decrypt it)
-                let content = linkData.content;
-                let title = linkData.title;
-                
-                // If we have an encryption key and content is encrypted, decrypt it
-                if (decryptionKey && linkData.encrypted) {
-                    // For demo purposes, if you want to implement actual encryption
-                    // You would decrypt here using the key from URL fragment
-                    console.log("Content would be decrypted with key:", decryptionKey);
-                }
+                let content = linkData.content || 'No content available.';
+                let title = linkData.title || 'Untitled';
                 
                 // Create HTML display
                 const contentDisplay = document.getElementById('contentDisplay');
                 contentDisplay.innerHTML = `
                     <div class="content-display">
-                        <div class="content-title">📄 ${escapeHtml(title)}</div>
+                        <div class="content-title">
+                            📄 ${escapeHtml(title)}
+                            ${linkData.hasPassword ? '<span class="security-badge" style="background:#e0e7ff;">🔒 Password Protected</span>' : '<span class="security-badge" style="background:#dcfce7;">🔓 Open Access</span>'}
+                        </div>
                         <div class="content-body">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
-                        ${linkData.expiration ? `<div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b;">
-                            ⏰ This link expires on: ${new Date(linkData.expiration).toLocaleString()}
-                        </div>` : ''}
+                        ${linkData.expiration ? `
+                            <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b;">
+                                ⏰ This link expires on: ${new Date(linkData.expiration).toLocaleString()}
+                            </div>
+                        ` : ''}
+                        <div style="margin-top: 15px; font-size: 0.75rem; color: #94a3b8; text-align: center;">
+                            Viewed ${(linkData.views || 0) + 1} times
+                        </div>
                     </div>
                 `;
                 
@@ -414,31 +539,14 @@
                 document.getElementById('contentSection').style.display = 'block';
                 
                 // Clear password from memory
-                if (document.getElementById('passwordInput')) {
-                    document.getElementById('passwordInput').value = '';
+                const passwordInput = document.getElementById('passwordInput');
+                if (passwordInput) {
+                    passwordInput.value = '';
                 }
                 
             } catch (err) {
                 console.error("Display error:", err);
                 showError(`Error displaying content: ${err.message}`);
-            }
-        }
-        
-        // Increment view counter
-        async function incrementViews(linkId) {
-            try {
-                const currentViews = linkData.views || 0;
-                const newViews = currentViews + 1;
-                
-                await fetch(`${DB_URL}/secureLinks/${linkId}/views.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newViews)
-                });
-                
-                console.log(`View count updated: ${newViews}`);
-            } catch (err) {
-                console.error("View increment error:", err);
             }
         }
         
@@ -449,8 +557,10 @@
             errorDiv.style.display = 'block';
             
             if (isFatal) {
-                document.getElementById('unlockBtn').disabled = true;
-                document.getElementById('passwordInput').disabled = true;
+                const unlockBtn = document.getElementById('unlockBtn');
+                const passwordInput = document.getElementById('passwordInput');
+                if (unlockBtn) unlockBtn.disabled = true;
+                if (passwordInput) passwordInput.disabled = true;
             }
             
             setTimeout(() => {
@@ -467,18 +577,51 @@
         }
         
         // Event listeners
-        document.getElementById('unlockBtn').addEventListener('click', verifyAndUnlock);
-        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') verifyAndUnlock();
-        });
+        const unlockBtn = document.getElementById('unlockBtn');
+        const passwordInput = document.getElementById('passwordInput');
+        
+        if (unlockBtn) {
+            unlockBtn.addEventListener('click', verifyAndUnlock);
+        }
+        
+        if (passwordInput) {
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') verifyAndUnlock();
+            });
+        }
         
         // Initialize
         loadLink();
         
-        // Show info if no encryption key in URL
+        // Show warning if no encryption key in URL for encrypted content
         if (!decryptionKey && window.location.hash === '') {
             console.log("No encryption key found in URL fragment");
+            // Add warning banner if content might be encrypted
+            setTimeout(() => {
+                if (linkData && linkData.content && linkData.content.length > 0) {
+                    const warningHtml = `
+                        <div class="warning-box" id="keyWarning" style="margin-top: 15px;">
+                            ⚠️ <strong>Note:</strong> This content may be encrypted. Make sure the URL contains the complete encryption key.
+                        </div>
+                    `;
+                    const unlockSection = document.getElementById('unlockSection');
+                    if (unlockSection && !document.getElementById('keyWarning')) {
+                        unlockSection.insertAdjacentHTML('beforeend', warningHtml);
+                        setTimeout(() => {
+                            const warning = document.getElementById('keyWarning');
+                            if (warning) warning.style.display = 'none';
+                        }, 8000);
+                    }
+                }
+            }, 1000);
         }
+        
+        // Clean up sensitive data from memory when page is unloaded
+        window.addEventListener('beforeunload', () => {
+            linkData = null;
+            decryptionKey = null;
+            if (passwordInput) passwordInput.value = '';
+        });
     </script>
 </body>
 </html>
