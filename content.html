@@ -159,21 +159,12 @@
             color: #334155;
             white-space: pre-wrap;
             word-wrap: break-word;
+            font-family: inherit;
         }
 
         .error-message {
             background: #fee2e2;
             color: #dc2626;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 15px;
-            text-align: center;
-            display: none;
-        }
-
-        .success-message {
-            background: #d1fae5;
-            color: #065f46;
             padding: 12px;
             border-radius: 10px;
             margin-top: 15px;
@@ -221,16 +212,6 @@
             margin-left: 10px;
         }
 
-        .info-box {
-            background: #dbeafe;
-            border-left: 4px solid #219EBC;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: #1e40af;
-        }
-
         .warning-box {
             background: #fef3c7;
             border-left: 4px solid #f59e0b;
@@ -239,16 +220,6 @@
             margin-bottom: 20px;
             font-size: 0.9rem;
             color: #92400e;
-        }
-
-        .expired-badge {
-            display: inline-block;
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            margin-left: 10px;
         }
 
         /* Dark mode support */
@@ -274,14 +245,28 @@
                 color: #94a3b8;
                 border-top-color: #334155;
             }
-            .info-box {
-                background: #1e293b;
-                color: #93c5fd;
-            }
             .warning-box {
                 background: #422006;
                 color: #fcd34d;
             }
+        }
+
+        .decrypt-status {
+            font-size: 0.75rem;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .decrypt-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .decrypt-error {
+            background: #fee2e2;
+            color: #dc2626;
         }
     </style>
 </head>
@@ -310,6 +295,7 @@
                     <div id="contentDisplay">
                         <!-- Content will be shown here -->
                     </div>
+                    <button id="backToUnlockBtn" style="margin-top: 20px; background: #64748b;">← Back to Unlock</button>
                 </div>
 
                 <div class="loading" id="loading">
@@ -343,12 +329,6 @@
             console.log("Encryption key found in URL fragment");
         }
         
-        // Decode email from encoded format (reverse of encodeEmail)
-        function decodeEmail(encodedEmail) {
-            if (!encodedEmail) return null;
-            return encodedEmail.replace(/-at-/g, '@').replace(/,/g, '.');
-        }
-        
         // SHA-256 hash function
         async function hashPassword(password) {
             const encoder = new TextEncoder();
@@ -358,29 +338,58 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
         
-        // Simple XOR decryption (for demo purposes - in production use AES-GCM)
-        function simpleDecrypt(encryptedText, key) {
-            if (!encryptedText || !key) return encryptedText;
+        // XOR encryption/decryption (must match share-module.js)
+        function xorTransform(text, key) {
+            if (!text || !key) return text;
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                const charCode = text.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+                result += String.fromCharCode(charCode);
+            }
+            return result;
+        }
+        
+        // Decrypt content using the encryption key
+        function decryptContent(encryptedContent, key) {
+            if (!encryptedContent || !key) {
+                console.warn("Missing encrypted content or key");
+                return encryptedContent;
+            }
+            
             try {
-                let result = '';
-                for (let i = 0; i < encryptedText.length; i++) {
-                    const charCode = encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length);
-                    result += String.fromCharCode(charCode);
+                console.log("Decrypting content...");
+                const decrypted = xorTransform(encryptedContent, key);
+                
+                // Check if decryption was successful (should contain readable text)
+                let printableCount = 0;
+                for (let i = 0; i < Math.min(decrypted.length, 100); i++) {
+                    const code = decrypted.charCodeAt(i);
+                    if ((code >= 32 && code <= 126) || code === 10 || code === 13 || code === 9) {
+                        printableCount++;
+                    }
                 }
-                return result;
+                
+                const isReadable = printableCount > Math.min(decrypted.length, 100) * 0.8;
+                
+                if (isReadable) {
+                    console.log("Decryption successful");
+                    return decrypted;
+                } else {
+                    console.warn("Decryption produced non-readable content");
+                    return encryptedContent;
+                }
             } catch (e) {
                 console.error("Decryption error:", e);
-                return encryptedText;
+                return encryptedContent;
             }
         }
         
-        // Fetch data from Firebase (single-node structure)
+        // Fetch data from Firebase
         async function getData(path) {
             try {
                 const response = await fetch(`${DB_URL}/${path}.json`);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
-                console.log(`Fetched ${path}:`, data);
                 return data;
             } catch (err) {
                 console.error('Fetch error:', err);
@@ -388,7 +397,7 @@
             }
         }
         
-        // Update view count in the single-node structure
+        // Update view count
         async function incrementViews(encodedUser, linkId, currentViews) {
             try {
                 const newViews = (currentViews || 0) + 1;
@@ -399,14 +408,32 @@
                     body: JSON.stringify(newViews)
                 });
                 console.log(`View count updated: ${newViews}`);
-                return newViews;
             } catch (err) {
                 console.error("View increment error:", err);
-                return currentViews;
             }
         }
         
-        // Load link data from single-node structure
+        // Reset to unlock state (clear content and show password form)
+        function resetToUnlock() {
+            // Clear displayed content
+            document.getElementById('contentDisplay').innerHTML = '';
+            document.getElementById('contentSection').style.display = 'none';
+            document.getElementById('unlockSection').style.display = 'block';
+            
+            // Clear password input
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput) {
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+            
+            // Clear any error messages
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+        }
+        
+        // Load link data (without auto-displaying)
         async function loadLink() {
             if (!linkId) {
                 showError('Invalid link. No content ID provided.', true);
@@ -421,7 +448,6 @@
             document.getElementById('loading').style.display = 'block';
             
             try {
-                // Fetch from single-node structure: shareLinks/{user}/{linkId}
                 const path = `shareLinks/${encodedUser}/${linkId}`;
                 linkData = await getData(path);
                 
@@ -430,7 +456,12 @@
                     return;
                 }
                 
-                console.log("Link data loaded:", linkData);
+                console.log("Link data loaded:", {
+                    id: linkData.id,
+                    title: linkData.title,
+                    hasPassword: linkData.hasPassword,
+                    contentLength: linkData.content?.length
+                });
                 
                 // Check expiration
                 if (linkData.expiration) {
@@ -441,28 +472,17 @@
                     }
                 }
                 
-                // Decrypt content if encryption key is available
-                if (decryptionKey && linkData.content) {
-                    try {
-                        // Attempt to decrypt content
-                        const decryptedContent = simpleDecrypt(linkData.content, decryptionKey);
-                        if (decryptedContent && decryptedContent !== linkData.content) {
-                            linkData.content = decryptedContent;
-                            console.log("Content decrypted successfully");
-                        }
-                    } catch (e) {
-                        console.warn("Decryption failed, using original content:", e);
-                    }
-                }
-                
-                // Check if link requires password
-                if (!linkData.hasPassword) {
-                    // No password required, just show content
-                    await displayContent();
-                } else {
-                    // Hide loading, show password form
+                // Always show password form if link has password
+                if (linkData.hasPassword) {
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('unlockSection').style.display = 'block';
+                } else {
+                    // No password required, but still need encryption key to decrypt
+                    if (decryptionKey) {
+                        await displayContent();
+                    } else {
+                        showError('Missing encryption key. The URL may be incomplete.', true);
+                    }
                 }
                 
             } catch (err) {
@@ -487,7 +507,6 @@
             
             try {
                 const enteredHash = await hashPassword(password);
-                console.log("Verifying password...");
                 
                 if (enteredHash === linkData.passwordHash) {
                     await displayContent();
@@ -508,11 +527,30 @@
         // Display the content
         async function displayContent() {
             try {
-                // Increment view counter in single-node structure
+                // Increment view counter
                 await incrementViews(encodedUser, linkId, linkData.views);
                 
                 let content = linkData.content || 'No content available.';
                 let title = linkData.title || 'Untitled';
+                let decryptionStatus = '';
+                
+                // Decrypt content using encryption key from URL fragment
+                if (decryptionKey && content) {
+                    console.log("Attempting to decrypt content...");
+                    const decrypted = decryptContent(content, decryptionKey);
+                    
+                    if (decrypted !== content) {
+                        content = decrypted;
+                        decryptionStatus = '<div class="decrypt-status decrypt-success">✓ Content decrypted successfully</div>';
+                        console.log("Content decrypted successfully");
+                    } else {
+                        decryptionStatus = '<div class="decrypt-status decrypt-error">⚠ Could not decrypt content. The encryption key may be incorrect.</div>';
+                        console.warn("Decryption failed");
+                    }
+                } else if (!decryptionKey) {
+                    decryptionStatus = '<div class="decrypt-status decrypt-error">⚠ Missing encryption key. Content cannot be decrypted.</div>';
+                    console.warn("No encryption key available");
+                }
                 
                 // Create HTML display
                 const contentDisplay = document.getElementById('contentDisplay');
@@ -523,6 +561,7 @@
                             ${linkData.hasPassword ? '<span class="security-badge" style="background:#e0e7ff;">🔒 Password Protected</span>' : '<span class="security-badge" style="background:#dcfce7;">🔓 Open Access</span>'}
                         </div>
                         <div class="content-body">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
+                        ${decryptionStatus}
                         ${linkData.expiration ? `
                             <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b;">
                                 ⏰ This link expires on: ${new Date(linkData.expiration).toLocaleString()}
@@ -530,6 +569,9 @@
                         ` : ''}
                         <div style="margin-top: 15px; font-size: 0.75rem; color: #94a3b8; text-align: center;">
                             Viewed ${(linkData.views || 0) + 1} times
+                        </div>
+                        <div style="margin-top: 15px; text-align: center;">
+                            <button id="closeContentBtn" style="background: #64748b; padding: 8px 16px; width: auto;">Lock & Close</button>
                         </div>
                     </div>
                 `;
@@ -542,6 +584,12 @@
                 const passwordInput = document.getElementById('passwordInput');
                 if (passwordInput) {
                     passwordInput.value = '';
+                }
+                
+                // Add close button listener
+                const closeBtn = document.getElementById('closeContentBtn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', resetToUnlock);
                 }
                 
             } catch (err) {
@@ -579,6 +627,7 @@
         // Event listeners
         const unlockBtn = document.getElementById('unlockBtn');
         const passwordInput = document.getElementById('passwordInput');
+        const backToUnlockBtn = document.getElementById('backToUnlockBtn');
         
         if (unlockBtn) {
             unlockBtn.addEventListener('click', verifyAndUnlock);
@@ -590,18 +639,20 @@
             });
         }
         
+        if (backToUnlockBtn) {
+            backToUnlockBtn.addEventListener('click', resetToUnlock);
+        }
+        
         // Initialize
         loadLink();
         
-        // Show warning if no encryption key in URL for encrypted content
+        // Show warning if no encryption key in URL
         if (!decryptionKey && window.location.hash === '') {
-            console.log("No encryption key found in URL fragment");
-            // Add warning banner if content might be encrypted
             setTimeout(() => {
-                if (linkData && linkData.content && linkData.content.length > 0) {
+                if (linkData) {
                     const warningHtml = `
                         <div class="warning-box" id="keyWarning" style="margin-top: 15px;">
-                            ⚠️ <strong>Note:</strong> This content may be encrypted. Make sure the URL contains the complete encryption key.
+                            ⚠️ <strong>Note:</strong> The encryption key is missing from the URL. Make sure the complete URL (including the part after #) is shared.
                         </div>
                     `;
                     const unlockSection = document.getElementById('unlockSection');
@@ -615,13 +666,6 @@
                 }
             }, 1000);
         }
-        
-        // Clean up sensitive data from memory when page is unloaded
-        window.addEventListener('beforeunload', () => {
-            linkData = null;
-            decryptionKey = null;
-            if (passwordInput) passwordInput.value = '';
-        });
     </script>
 </body>
 </html>
