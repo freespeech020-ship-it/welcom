@@ -71,6 +71,12 @@
             margin-bottom: 20px;
         }
 
+        .open-icon {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
         .password-form {
             max-width: 400px;
             margin: 0 auto;
@@ -212,13 +218,13 @@
             margin-left: 10px;
         }
 
-        .warning-box {
+        .badge-open {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-password {
             background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
             color: #92400e;
         }
 
@@ -230,39 +236,6 @@
             margin-bottom: 20px;
             font-size: 0.9rem;
             color: #1e40af;
-        }
-
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            .secure-card {
-                background: #1e293b;
-            }
-            .content-display {
-                background: #0f172a;
-            }
-            .content-title {
-                color: #f1f5f9;
-                border-bottom-color: #334155;
-            }
-            .content-body {
-                color: #cbd5e1;
-            }
-            label {
-                color: #f1f5f9;
-            }
-            .footer {
-                background: #0f172a;
-                color: #94a3b8;
-                border-top-color: #334155;
-            }
-            .warning-box {
-                background: #422006;
-                color: #fcd34d;
-            }
-            .info-box {
-                background: #1e293b;
-                color: #93c5fd;
-            }
         }
 
         .view-count {
@@ -291,6 +264,35 @@
         .btn-secondary:hover {
             background: #475569;
         }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .secure-card {
+                background: #1e293b;
+            }
+            .content-display {
+                background: #0f172a;
+            }
+            .content-title {
+                color: #f1f5f9;
+                border-bottom-color: #334155;
+            }
+            .content-body {
+                color: #cbd5e1;
+            }
+            label {
+                color: #f1f5f9;
+            }
+            .footer {
+                background: #0f172a;
+                color: #94a3b8;
+                border-top-color: #334155;
+            }
+            .info-box {
+                background: #1e293b;
+                color: #93c5fd;
+            }
+        }
     </style>
 </head>
 <body>
@@ -298,20 +300,29 @@
         <div class="secure-card">
             <div class="header">
                 <h1>🔒 PriBox Secure Content</h1>
-                <p>Password protected secure sharing</p>
+                <p>Secure sharing made simple</p>
             </div>
 
             <div class="content-area">
                 <div id="unlockSection">
-                    <div class="lock-icon">🔐</div>
-                    <div class="password-form">
-                        <div class="form-group">
-                            <label>Enter Password to Access</label>
-                            <input type="password" id="passwordInput" placeholder="Content password" autocomplete="off">
+                    <div id="openAccessMessage" style="display: none;">
+                        <div class="open-icon">🔓</div>
+                        <div class="info-box" style="text-align: center;">
+                            This content is open access. Click the button below to view.
                         </div>
-                        <button id="unlockBtn">Unlock Content</button>
-                        <div id="errorMessage" class="error-message"></div>
+                        <button id="viewOpenContentBtn">View Content</button>
                     </div>
+                    <div id="passwordAccessMessage" style="display: none;">
+                        <div class="lock-icon">🔐</div>
+                        <div class="password-form">
+                            <div class="form-group">
+                                <label>Enter Password to Access</label>
+                                <input type="password" id="passwordInput" placeholder="Content password" autocomplete="off">
+                            </div>
+                            <button id="unlockBtn">Unlock Content</button>
+                        </div>
+                    </div>
+                    <div id="errorMessage" class="error-message"></div>
                 </div>
 
                 <div id="contentSection" style="display: none;">
@@ -329,7 +340,7 @@
             </div>
 
             <div class="footer">
-                <span>🔒 Password protected</span>
+                <span>🔒 Secure sharing</span>
                 <span class="security-badge">Powered by PriBox</span>
             </div>
         </div>
@@ -345,7 +356,7 @@
         const encodedUser = urlParams.get('user');
         
         let linkData = null;
-        let viewIncremented = false; // Track if we've already incremented views for this session
+        let viewIncremented = false;
         
         // SHA-256 hash function
         async function hashPassword(password) {
@@ -369,7 +380,7 @@
             }
         }
         
-        // Update view count in Firebase (only once per successful unlock)
+        // Update view count in Firebase (only once per successful view)
         async function incrementViews() {
             if (viewIncremented) {
                 console.log("View already counted for this session");
@@ -406,12 +417,30 @@
             const passwordInput = document.getElementById('passwordInput');
             if (passwordInput) {
                 passwordInput.value = '';
-                passwordInput.focus();
             }
             
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
+            
+            // Show the appropriate access message based on link type
+            if (linkData) {
+                showAccessMessage();
+            }
+        }
+        
+        // Show the appropriate access message based on link type
+        function showAccessMessage() {
+            const openAccessDiv = document.getElementById('openAccessMessage');
+            const passwordAccessDiv = document.getElementById('passwordAccessMessage');
+            
+            if (linkData.hasPassword) {
+                openAccessDiv.style.display = 'none';
+                passwordAccessDiv.style.display = 'block';
+            } else {
+                openAccessDiv.style.display = 'block';
+                passwordAccessDiv.style.display = 'none';
+            }
         }
         
         // Load link data
@@ -453,13 +482,30 @@
                     }
                 }
                 
-                // Always show password form (all links require password)
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('unlockSection').style.display = 'block';
+                
+                // Show appropriate access message
+                showAccessMessage();
                 
             } catch (err) {
                 console.error('Load error:', err);
                 showError(`Error loading content: ${err.message}`, true);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        // View open access content (no password)
+        async function viewOpenContent() {
+            document.getElementById('loading').style.display = 'block';
+            
+            try {
+                await incrementViews();
+                await displayContent();
+            } catch (err) {
+                console.error("View error:", err);
+                showError(`Error: ${err.message}`);
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
@@ -481,7 +527,6 @@
                 const enteredHash = await hashPassword(password);
                 
                 if (enteredHash === linkData.passwordHash) {
-                    // Password correct - increment view count and show content
                     await incrementViews();
                     await displayContent();
                 } else {
@@ -498,7 +543,7 @@
             }
         }
         
-        // Display the content (plain text, no decryption needed)
+        // Display the content
         async function displayContent() {
             try {
                 let content = linkData.content || 'No content available.';
@@ -510,7 +555,7 @@
                     <div class="content-display">
                         <div class="content-title">
                             📄 ${escapeHtml(title)}
-                            <span class="security-badge">🔒 Password Protected</span>
+                            ${linkData.hasPassword ? '<span class="security-badge badge-password">🔒 Password Protected</span>' : '<span class="security-badge badge-open">🔓 Open Access</span>'}
                         </div>
                         <div class="content-body">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
                         ${linkData.expiration ? `
@@ -548,8 +593,10 @@
             
             if (isFatal) {
                 const unlockBtn = document.getElementById('unlockBtn');
+                const viewOpenBtn = document.getElementById('viewOpenContentBtn');
                 const passwordInput = document.getElementById('passwordInput');
                 if (unlockBtn) unlockBtn.disabled = true;
+                if (viewOpenBtn) viewOpenBtn.disabled = true;
                 if (passwordInput) passwordInput.disabled = true;
             }
             
@@ -569,6 +616,7 @@
         // Event listeners
         const unlockBtn = document.getElementById('unlockBtn');
         const passwordInput = document.getElementById('passwordInput');
+        const viewOpenContentBtn = document.getElementById('viewOpenContentBtn');
         const backToUnlockBtn = document.getElementById('backToUnlockBtn');
         
         if (unlockBtn) {
@@ -581,31 +629,16 @@
             });
         }
         
+        if (viewOpenContentBtn) {
+            viewOpenContentBtn.addEventListener('click', viewOpenContent);
+        }
+        
         if (backToUnlockBtn) {
             backToUnlockBtn.addEventListener('click', resetToUnlock);
         }
         
         // Initialize
         loadLink();
-        
-        // Show info box for first-time visitors
-        setTimeout(() => {
-            if (linkData && !linkData.hasPassword) {
-                const infoHtml = `
-                    <div class="info-box" id="infoBox" style="margin-top: 15px;">
-                        ℹ️ This content is password protected. Enter the password provided by the sender to view.
-                    </div>
-                `;
-                const unlockSection = document.getElementById('unlockSection');
-                if (unlockSection && !document.getElementById('infoBox')) {
-                    unlockSection.insertAdjacentHTML('beforeend', infoHtml);
-                    setTimeout(() => {
-                        const infoBox = document.getElementById('infoBox');
-                        if (infoBox) infoBox.style.display = 'none';
-                    }, 5000);
-                }
-            }
-        }, 1000);
     </script>
 </body>
 </html>
