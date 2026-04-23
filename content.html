@@ -799,75 +799,111 @@
         }
         
         // Load link data - now using only linkId
-        async function loadLink() {
-            if (!linkId) {
-                showError('Invalid link. No content ID provided.', true);
+        // Add this helper function to content.html
+function isLinkAccessible(linkData) {
+    if (!linkData) return false;
+    if (linkData.status === 'pending') return false;
+    if (linkData.isDestroyed) return false;
+    if (linkData.expiration && new Date(linkData.expiration) < new Date()) return false;
+    return true;
+}
+
+// Update the loadLink function, after checking view-once destruction, add status check:
+async function loadLink() {
+    if (!linkId) {
+        showError('Invalid link. No content ID provided.', true);
+        return;
+    }
+    
+    document.getElementById('loading').style.display = 'block';
+    
+    try {
+        const path = `shareLinks/${linkId}`;
+        linkData = await getData(path);
+        
+        if (!linkData) {
+            showError('Link not found or has been deleted.', true);
+            return;
+        }
+        
+        console.log("Link loaded:", {
+            id: linkData.id,
+            title: linkData.title,
+            type: linkData.type || 'text',
+            hasPassword: linkData.hasPassword,
+            views: linkData.views || 0,
+            photoCount: linkData.photoCount || 0,
+            ownerEmail: linkData.ownerEmail || 'Unknown',
+            viewOnce: linkData.viewOnce || false,
+            isDestroyed: linkData.isDestroyed || false,
+            status: linkData.status || 'active'
+        });
+        
+        // Check if link is accessible (active, not destroyed, not expired)
+        if (!isLinkAccessible(linkData)) {
+            if (linkData.status === 'pending') {
+                showError('This link is currently pending and not accessible. Please contact the owner to activate it.', true);
+            } else if (linkData.isDestroyed) {
+                showError('This link has been destroyed and is no longer accessible.', true);
+            } else if (linkData.expiration && new Date(linkData.expiration) < new Date()) {
+                showError('This link has expired.', true);
+            } else {
+                showError('This link is not accessible.', true);
+            }
+            
+            document.getElementById('unlockSection').style.display = 'none';
+            document.getElementById('contentSection').style.display = 'block';
+            document.getElementById('contentDisplay').innerHTML = `
+                <div class="destroyed-message">
+                    <div style="font-size: 3rem; margin-bottom: 16px;">⛔</div>
+                    <h3 style="margin-bottom: 12px;">Content Not Accessible</h3>
+                    <p>${linkData.status === 'pending' ? 'This link is currently pending and not yet active.' : 'This link is no longer available.'}</p>
+                    <p style="margin-top: 12px; font-size: 0.85rem;">Please contact the owner for more information.</p>
+                </div>
+            `;
+            document.getElementById('loading').style.display = 'none';
+            return;
+        }
+        
+        // Check if view-once link is destroyed
+        if (linkData.viewOnce && linkData.isDestroyed) {
+            showError('This link has been destroyed because it was in "View Once" mode and has already been viewed.', true);
+            document.getElementById('unlockSection').style.display = 'none';
+            document.getElementById('contentSection').style.display = 'block';
+            document.getElementById('contentDisplay').innerHTML = `
+                <div class="destroyed-message">
+                    <div style="font-size: 3rem; margin-bottom: 16px;">💀</div>
+                    <h3 style="margin-bottom: 12px;">Content Destroyed</h3>
+                    <p>This content was set to "View Once" mode and has already been viewed and destroyed.</p>
+                    <p style="margin-top: 12px; font-size: 0.85rem;">The link is no longer valid for access.</p>
+                </div>
+            `;
+            document.getElementById('loading').style.display = 'none';
+            return;
+        }
+        
+        // Check expiration
+        if (linkData.expiration) {
+            const expDate = new Date(linkData.expiration);
+            if (expDate < new Date()) {
+                showError('This link has expired.', true);
                 return;
             }
-            
-            document.getElementById('loading').style.display = 'block';
-            
-            try {
-                // Direct lookup by linkId - no user parameter needed
-                const path = `shareLinks/${linkId}`;
-                linkData = await getData(path);
-                
-                if (!linkData) {
-                    showError('Link not found or has been deleted.', true);
-                    return;
-                }
-                
-                console.log("Link loaded:", {
-                    id: linkData.id,
-                    title: linkData.title,
-                    type: linkData.type || 'text',
-                    hasPassword: linkData.hasPassword,
-                    views: linkData.views || 0,
-                    photoCount: linkData.photoCount || 0,
-                    ownerEmail: linkData.ownerEmail || 'Unknown',
-                    viewOnce: linkData.viewOnce || false,
-                    isDestroyed: linkData.isDestroyed || false
-                });
-                
-                // Check if view-once link is destroyed
-                if (linkData.viewOnce && linkData.isDestroyed) {
-                    showError('This link has been destroyed because it was in "View Once" mode and has already been viewed.', true);
-                    document.getElementById('unlockSection').style.display = 'none';
-                    document.getElementById('contentSection').style.display = 'block';
-                    document.getElementById('contentDisplay').innerHTML = `
-                        <div class="destroyed-message">
-                            <div style="font-size: 3rem; margin-bottom: 16px;">💀</div>
-                            <h3 style="margin-bottom: 12px;">Content Destroyed</h3>
-                            <p>This content was set to "View Once" mode and has already been viewed and destroyed.</p>
-                            <p style="margin-top: 12px; font-size: 0.85rem;">The link is no longer valid for access.</p>
-                        </div>
-                    `;
-                    document.getElementById('loading').style.display = 'none';
-                    return;
-                }
-                
-                // Check expiration
-                if (linkData.expiration) {
-                    const expDate = new Date(linkData.expiration);
-                    if (expDate < new Date()) {
-                        showError('This link has expired.', true);
-                        return;
-                    }
-                }
-                
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('unlockSection').style.display = 'block';
-                
-                // Show appropriate access message
-                showAccessMessage();
-                
-            } catch (err) {
-                console.error('Load error:', err);
-                showError(`Error loading content: ${err.message}`, true);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-            }
         }
+        
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('unlockSection').style.display = 'block';
+        
+        // Show appropriate access message
+        showAccessMessage();
+        
+    } catch (err) {
+        console.error('Load error:', err);
+        showError(`Error loading content: ${err.message}`, true);
+    } finally {
+        document.getElementById('loading').style.display = 'none';
+    }
+}
         
         // View open access content (no password)
         async function viewOpenContent() {
