@@ -355,6 +355,11 @@
             color: #3730a3;
         }
 
+        .badge-viewonce {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
         .info-box {
             background: #dbeafe;
             border-left: 4px solid #219EBC;
@@ -392,6 +397,53 @@
             background: #475569;
         }
 
+        /* Timer Styles */
+        .timer-container {
+            text-align: center;
+            padding: 20px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .timer-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #f59e0b;
+            font-family: monospace;
+            margin-top: 8px;
+        }
+
+        .timer-warning {
+            color: #f59e0b;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .countdown-active {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .destroyed-message {
+            text-align: center;
+            padding: 40px;
+            background: #fef2f2;
+            border-radius: 12px;
+            color: #dc2626;
+        }
+
+        .destroyed-message .material-icons {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
         /* Dark mode support */
         @media (prefers-color-scheme: dark) {
             .secure-card {
@@ -425,6 +477,9 @@
             .photo-name {
                 color: #f1f5f9;
             }
+            .destroyed-message {
+                background: #2d1a1a;
+            }
         }
 
         /* Responsive */
@@ -440,6 +495,9 @@
                 font-size: 1.2rem;
                 flex-direction: column;
                 text-align: center;
+            }
+            .timer-display {
+                font-size: 1.8rem;
             }
         }
     </style>
@@ -518,6 +576,9 @@
         let viewIncremented = false;
         let currentPhotoIndex = 0;
         let currentPhotos = [];
+        let countdownInterval = null;
+        let isContentDisplayed = false;
+        let isDestroyed = false;
         
         // SHA-256 hash function
         async function hashPassword(password) {
@@ -538,6 +599,21 @@
             } catch (err) {
                 console.error('Fetch error:', err);
                 return null;
+            }
+        }
+        
+        // Update data in Firebase
+        async function putData(path, data) {
+            try {
+                const response = await fetch(`${DB_URL}/${path}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                return response.ok;
+            } catch (err) {
+                console.error('PUT error:', err);
+                return false;
             }
         }
         
@@ -569,8 +645,96 @@
             }
         }
         
+        // Destroy a view-once link permanently
+        async function destroyViewOnceLink() {
+            if (!linkData || !linkData.viewOnce || linkData.isDestroyed) return;
+            
+            console.log("Destroying view-once link...");
+            
+            try {
+                // Mark as destroyed in the database
+                const destroyed = await putData(`shareLinks/${linkId}/isDestroyed`, true);
+                
+                if (destroyed) {
+                    linkData.isDestroyed = true;
+                    isDestroyed = true;
+                    console.log("View-once link destroyed successfully");
+                }
+            } catch (err) {
+                console.error("Error destroying view-once link:", err);
+            }
+        }
+        
+        // Start countdown timer for view-once content
+        function startViewOnceCountdown(callback) {
+            let secondsLeft = 10;
+            const timerContainer = document.createElement('div');
+            timerContainer.className = 'timer-container';
+            timerContainer.innerHTML = `
+                <div class="timer-warning">⚠️ This content is in VIEW ONCE mode!</div>
+                <div class="timer-display countdown-active">00:${secondsLeft.toString().padStart(2, '0')}</div>
+                <div class="timer-warning">Content will be permanently destroyed after this timer reaches zero</div>
+            `;
+            
+            // Insert timer at the top of content display
+            const contentDisplay = document.getElementById('contentDisplay');
+            contentDisplay.insertBefore(timerContainer, contentDisplay.firstChild);
+            
+            countdownInterval = setInterval(() => {
+                secondsLeft--;
+                const timerDisplay = timerContainer.querySelector('.timer-display');
+                
+                if (secondsLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    timerDisplay.textContent = "00:00";
+                    timerDisplay.classList.remove('countdown-active');
+                    timerContainer.style.background = 'rgba(220, 38, 38, 0.1)';
+                    timerContainer.style.borderColor = '#dc2626';
+                    timerContainer.querySelector('.timer-warning').innerHTML = '💀 Content has been permanently destroyed!';
+                    
+                    // Destroy the content
+                    destroyViewOnceLink().then(() => {
+                        // Replace content with destroyed message
+                        contentDisplay.innerHTML = `
+                            <div class="destroyed-message">
+                                <div style="font-size: 3rem; margin-bottom: 16px;">💀</div>
+                                <h3 style="margin-bottom: 12px;">Content Destroyed</h3>
+                                <p>This content was set to "View Once" mode and has been permanently destroyed after 10 seconds.</p>
+                                <p style="margin-top: 12px; font-size: 0.85rem;">The link is no longer valid for future access.</p>
+                            </div>
+                        `;
+                        
+                        // Disable further interactions
+                        const backBtn = document.getElementById('backToUnlockBtn');
+                        if (backBtn) {
+                            backBtn.disabled = true;
+                            backBtn.style.opacity = '0.5';
+                        }
+                    });
+                    
+                    if (callback) callback();
+                } else {
+                    const minutes = Math.floor(secondsLeft / 60);
+                    const secs = secondsLeft % 60;
+                    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    
+                    // Add warning classes when time is low
+                    if (secondsLeft <= 3) {
+                        timerDisplay.style.color = '#dc2626';
+                        timerDisplay.style.animation = 'pulse 0.5s infinite';
+                    }
+                }
+            }, 1000);
+        }
+        
         // Reset to unlock state
         function resetToUnlock() {
+            // Clear any active countdown
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            
             document.getElementById('contentDisplay').innerHTML = '';
             document.getElementById('contentSection').style.display = 'none';
             document.getElementById('unlockSection').style.display = 'block';
@@ -584,11 +748,19 @@
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
             
+            isContentDisplayed = false;
+            isDestroyed = false;
+            
             // Reset photo modal
             closePhotoModal();
             
             // Show the appropriate access message based on link type
             if (linkData) {
+                // Check if view-once link is already destroyed
+                if (linkData.viewOnce && linkData.isDestroyed) {
+                    showError('This link has been destroyed because it was in "View Once" mode and has already been viewed.', true);
+                    return;
+                }
                 showAccessMessage();
             }
         }
@@ -604,6 +776,25 @@
             } else {
                 openAccessDiv.style.display = 'block';
                 passwordAccessDiv.style.display = 'none';
+            }
+            
+            // Add view-once warning to access message if applicable
+            if (linkData.viewOnce && !linkData.isDestroyed) {
+                const infoBox = document.querySelector('#openAccessMessage .info-box, #passwordAccessMessage .info-box');
+                if (infoBox) {
+                    const existingWarning = infoBox.querySelector('.view-once-warning');
+                    if (!existingWarning) {
+                        const warningSpan = document.createElement('div');
+                        warningSpan.className = 'view-once-warning';
+                        warningSpan.style.marginTop = '10px';
+                        warningSpan.style.padding = '8px';
+                        warningSpan.style.background = 'rgba(245, 158, 11, 0.2)';
+                        warningSpan.style.borderRadius = '8px';
+                        warningSpan.style.fontSize = '0.8rem';
+                        warningSpan.innerHTML = '⚠️ <strong>View Once Mode:</strong> This content will be visible for only 10 seconds after first view, then permanently destroyed!';
+                        infoBox.appendChild(warningSpan);
+                    }
+                }
             }
         }
         
@@ -633,8 +824,27 @@
                     hasPassword: linkData.hasPassword,
                     views: linkData.views || 0,
                     photoCount: linkData.photoCount || 0,
-                    ownerEmail: linkData.ownerEmail || 'Unknown'
+                    ownerEmail: linkData.ownerEmail || 'Unknown',
+                    viewOnce: linkData.viewOnce || false,
+                    isDestroyed: linkData.isDestroyed || false
                 });
+                
+                // Check if view-once link is destroyed
+                if (linkData.viewOnce && linkData.isDestroyed) {
+                    showError('This link has been destroyed because it was in "View Once" mode and has already been viewed.', true);
+                    document.getElementById('unlockSection').style.display = 'none';
+                    document.getElementById('contentSection').style.display = 'block';
+                    document.getElementById('contentDisplay').innerHTML = `
+                        <div class="destroyed-message">
+                            <div style="font-size: 3rem; margin-bottom: 16px;">💀</div>
+                            <h3 style="margin-bottom: 12px;">Content Destroyed</h3>
+                            <p>This content was set to "View Once" mode and has already been viewed and destroyed.</p>
+                            <p style="margin-top: 12px; font-size: 0.85rem;">The link is no longer valid for access.</p>
+                        </div>
+                    `;
+                    document.getElementById('loading').style.display = 'none';
+                    return;
+                }
                 
                 // Check expiration
                 if (linkData.expiration) {
@@ -661,11 +871,18 @@
         
         // View open access content (no password)
         async function viewOpenContent() {
+            if (isContentDisplayed) return;
+            
             document.getElementById('loading').style.display = 'block';
             
             try {
                 await incrementViews();
                 await displayContent();
+                
+                // Start countdown for view-once links
+                if (linkData.viewOnce && !linkData.isDestroyed) {
+                    startViewOnceCountdown();
+                }
             } catch (err) {
                 console.error("View error:", err);
                 showError(`Error: ${err.message}`);
@@ -676,6 +893,8 @@
         
         // Verify password and display content
         async function verifyAndUnlock() {
+            if (isContentDisplayed) return;
+            
             const password = document.getElementById('passwordInput').value;
             
             if (!password) {
@@ -692,6 +911,11 @@
                 if (enteredHash === linkData.passwordHash) {
                     await incrementViews();
                     await displayContent();
+                    
+                    // Start countdown for view-once links
+                    if (linkData.viewOnce && !linkData.isDestroyed) {
+                        startViewOnceCountdown();
+                    }
                 } else {
                     showError('Incorrect password. Please try again.');
                     document.getElementById('passwordInput').value = '';
@@ -711,6 +935,11 @@
             const content = linkData.content || 'No content available.';
             const title = linkData.title || 'Untitled';
             
+            let viewOnceBadge = '';
+            if (linkData.viewOnce) {
+                viewOnceBadge = '<span class="security-badge badge-viewonce">🔥 View Once</span>';
+            }
+            
             return `
                 <div class="content-display">
                     <div class="content-title">
@@ -719,6 +948,7 @@
                             <span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">
                                 ${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}
                             </span>
+                            ${viewOnceBadge}
                         </div>
                     </div>
                     <div class="content-body">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
@@ -734,6 +964,11 @@
             const photos = linkData.photos || [];
             const title = linkData.title || 'Shared Photos';
             
+            let viewOnceBadge = '';
+            if (linkData.viewOnce) {
+                viewOnceBadge = '<span class="security-badge badge-viewonce">🔥 View Once</span>';
+            }
+            
             if (photos.length === 0) {
                 return `
                     <div class="content-display">
@@ -744,6 +979,7 @@
                                 <span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">
                                     ${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}
                                 </span>
+                                ${viewOnceBadge}
                             </div>
                         </div>
                         <div class="content-body">No photos available.</div>
@@ -765,6 +1001,7 @@
                             <span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">
                                 ${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}
                             </span>
+                            ${viewOnceBadge}
                         </div>
                     </div>
                     <div class="photo-gallery">
@@ -815,8 +1052,6 @@
         
         function getOwnerHTML() {
             if (linkData.ownerEmail) {
-                // Only show the owner info if you want to - optional
-                // You can comment this out if you don't want to display who shared it
                 return `
                     <div class="view-count" style="margin-top: 5px;">
                         📧 Shared by: ${escapeHtml(linkData.ownerEmail)}
@@ -828,6 +1063,8 @@
         
         // Display the content (text or photos)
         async function displayContent() {
+            if (isContentDisplayed) return;
+            
             try {
                 const contentDisplay = document.getElementById('contentDisplay');
                 const contentType = linkData.type || 'text';
@@ -844,6 +1081,8 @@
                 // Hide unlock section, show content
                 document.getElementById('unlockSection').style.display = 'none';
                 document.getElementById('contentSection').style.display = 'block';
+                
+                isContentDisplayed = true;
                 
                 // Clear password from memory
                 const passwordInput = document.getElementById('passwordInput');
