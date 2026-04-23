@@ -510,10 +510,9 @@
         // Firebase configuration
         const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
         
-        // Get parameters from URL
+        // Get parameters from URL - only need the link ID now
         const urlParams = new URLSearchParams(window.location.search);
         const linkId = urlParams.get('id');
-        const encodedUser = urlParams.get('user');
         
         let linkData = null;
         let viewIncremented = false;
@@ -552,7 +551,7 @@
             try {
                 const currentViews = linkData.views || 0;
                 const newViews = currentViews + 1;
-                const path = `shareLinks/${encodedUser}/${linkId}/views`;
+                const path = `shareLinks/${linkId}/views`;
                 
                 const response = await fetch(`${DB_URL}/${path}.json`, {
                     method: 'PUT',
@@ -608,22 +607,18 @@
             }
         }
         
-        // Load link data
+        // Load link data - now using only linkId
         async function loadLink() {
             if (!linkId) {
                 showError('Invalid link. No content ID provided.', true);
                 return;
             }
             
-            if (!encodedUser) {
-                showError('Invalid link. Missing user information.', true);
-                return;
-            }
-            
             document.getElementById('loading').style.display = 'block';
             
             try {
-                const path = `shareLinks/${encodedUser}/${linkId}`;
+                // Direct lookup by linkId - no user parameter needed
+                const path = `shareLinks/${linkId}`;
                 linkData = await getData(path);
                 
                 if (!linkData) {
@@ -637,7 +632,8 @@
                     type: linkData.type || 'text',
                     hasPassword: linkData.hasPassword,
                     views: linkData.views || 0,
-                    photoCount: linkData.photoCount || 0
+                    photoCount: linkData.photoCount || 0,
+                    ownerEmail: linkData.ownerEmail || 'Unknown'
                 });
                 
                 // Check expiration
@@ -728,6 +724,7 @@
                     <div class="content-body">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
                     ${getExpirationHTML()}
                     ${getViewCountHTML()}
+                    ${getOwnerHTML()}
                 </div>
             `;
         }
@@ -752,6 +749,7 @@
                         <div class="content-body">No photos available.</div>
                         ${getExpirationHTML()}
                         ${getViewCountHTML()}
+                        ${getOwnerHTML()}
                     </div>
                 `;
             }
@@ -789,6 +787,7 @@
                     </div>
                     ${getExpirationHTML()}
                     ${getViewCountHTML()}
+                    ${getOwnerHTML()}
                 </div>
             `;
             
@@ -812,6 +811,19 @@
                     👁️ Viewed ${linkData.views || 0} time${(linkData.views || 0) !== 1 ? 's' : ''}
                 </div>
             `;
+        }
+        
+        function getOwnerHTML() {
+            if (linkData.ownerEmail) {
+                // Only show the owner info if you want to - optional
+                // You can comment this out if you don't want to display who shared it
+                return `
+                    <div class="view-count" style="margin-top: 5px;">
+                        📧 Shared by: ${escapeHtml(linkData.ownerEmail)}
+                    </div>
+                `;
+            }
+            return '';
         }
         
         // Display the content (text or photos)
