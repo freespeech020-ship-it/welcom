@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Secure Content - PriBox Share</title>
+    <title>PriBox Secure Content - View Once</title>
     <style>
         * {
             margin: 0;
@@ -33,14 +33,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .header {
@@ -50,1259 +44,488 @@
             text-align: center;
         }
 
-        .header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-        }
+        .header h1 { font-size: 1.8rem; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 0.9rem; }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 0.9rem;
-        }
-
-        .content-area {
-            padding: 40px;
-        }
-
-        .lock-icon {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-
-        .open-icon {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-
-        .password-form {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
+        .content-area { padding: 40px; }
+        .lock-icon, .open-icon { text-align: center; font-size: 3rem; margin-bottom: 20px; }
+        .password-form { max-width: 400px; margin: 0 auto; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
         input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s;
+            width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px;
+            font-size: 16px; transition: all 0.3s;
         }
-
-        input:focus {
-            outline: none;
-            border-color: #219EBC;
-            box-shadow: 0 0 0 3px rgba(33, 158, 188, 0.1);
-        }
-
+        input:focus { outline: none; border-color: #219EBC; box-shadow: 0 0 0 3px rgba(33,158,188,0.1); }
         button {
-            width: 100%;
-            padding: 14px;
-            background: #219EBC;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            width: 100%; padding: 14px; background: #219EBC; color: white; border: none;
+            border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;
         }
-
-        button:hover {
-            background: #1a7a94;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(33, 158, 188, 0.3);
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
+        button:hover { background: #1a7a94; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(33,158,188,0.3); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
         .content-display {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 30px;
-            margin-top: 20px;
+            background: #f8fafc; border-radius: 16px; padding: 30px; margin-top: 20px;
             animation: slideIn 0.3s ease-out;
         }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .content-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            font-size: 1.5rem; font-weight: 600; color: #1e293b; margin-bottom: 20px;
+            padding-bottom: 10px; border-bottom: 2px solid #e2e8f0;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
         }
-
-        .content-body {
-            line-height: 1.6;
-            color: #334155;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: inherit;
-        }
-
-        /* Photo Gallery Styles */
+        .content-body { line-height: 1.6; color: #334155; white-space: pre-wrap; word-wrap: break-word; }
         .photo-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px; margin-top: 20px;
         }
-
         .photo-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
+            background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;
         }
-
-        .photo-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-
-        .photo-card img {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            display: block;
-        }
-
-        .photo-info {
-            padding: 12px;
-        }
-
-        .photo-name {
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 4px;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .photo-meta {
-            font-size: 0.7rem;
-            color: #64748b;
-        }
-
-        /* Modal for full-size photo viewing */
+        .photo-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .photo-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+        .photo-info { padding: 12px; }
+        .photo-name { font-weight: 600; color: #1e293b; margin-bottom: 4px; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .photo-meta { font-size: 0.7rem; color: #64748b; }
         .photo-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; cursor: pointer;
         }
-
-        .photo-modal.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .photo-modal img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
-        .photo-modal-close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: white;
-            font-size: 40px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .photo-modal-close:hover {
-            transform: scale(1.1);
-        }
-
+        .photo-modal.active { display: flex; animation: fadeIn 0.3s ease; }
+        .photo-modal img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; }
+        .photo-modal-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; transition: transform 0.2s; }
+        .photo-modal-close:hover { transform: scale(1.1); }
         .photo-modal-nav {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 40px;
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 15px; background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 40px;
         }
-
-        .photo-modal-nav button {
-            width: auto;
-            padding: 8px 16px;
-            background: #219EBC;
-            margin: 0;
-        }
-
-        .photo-modal-nav button:hover {
-            background: #1a7a94;
-        }
-
-        .photo-counter {
-            color: white;
-            padding: 8px 12px;
-            font-size: 0.85rem;
-        }
-
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 15px;
-            text-align: center;
-            display: none;
-        }
-
-        .loading {
-            text-align: center;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #219EBC;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .footer {
-            padding: 20px;
-            text-align: center;
-            background: #f8fafc;
-            color: #64748b;
-            font-size: 0.85rem;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .security-badge {
-            display: inline-block;
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            margin-left: 10px;
-        }
-
-        .badge-open {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .badge-password {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .badge-photos {
-            background: #e0e7ff;
-            color: #3730a3;
-        }
-
-        .badge-viewonce {
-            background: #fed7aa;
-            color: #9a3412;
-        }
-
-        .info-box {
-            background: #dbeafe;
-            border-left: 4px solid #219EBC;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: #1e40af;
-        }
-
-        .view-count {
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 1px solid #e2e8f0;
-            font-size: 0.75rem;
-            color: #64748b;
-            text-align: center;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .button-group button {
-            flex: 1;
-        }
-
-        .btn-secondary {
-            background: #64748b;
-        }
-
-        .btn-secondary:hover {
-            background: #475569;
-        }
-
-        /* Timer Styles */
+        .photo-modal-nav button { width: auto; padding: 8px 16px; background: #219EBC; margin: 0; }
+        .photo-modal-nav button:hover { background: #1a7a94; }
+        .photo-counter { color: white; padding: 8px 12px; font-size: 0.85rem; }
+        .error-message { background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 10px; margin-top: 15px; text-align: center; display: none; }
+        .loading { text-align: center; margin-top: 20px; display: none; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #219EBC; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .footer { padding: 20px; text-align: center; background: #f8fafc; color: #64748b; font-size: 0.85rem; border-top: 1px solid #e2e8f0; }
+        .security-badge { display: inline-block; background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; margin-left: 10px; }
+        .badge-open { background: #d1fae5; color: #065f46; }
+        .badge-password { background: #fef3c7; color: #92400e; }
+        .badge-photos { background: #e0e7ff; color: #3730a3; }
+        .badge-viewonce { background: #fed7aa; color: #9a3412; }
+        .info-box { background: #dbeafe; border-left: 4px solid #219EBC; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; color: #1e40af; }
+        .view-count { margin-top: 15px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.75rem; color: #64748b; text-align: center; }
+        .button-group { display: flex; gap: 10px; margin-top: 20px; }
+        .button-group button { flex: 1; }
+        .btn-secondary { background: #64748b; }
+        .btn-secondary:hover { background: #475569; }
+        /* Single Timer Styles - unified and clean */
         .timer-container {
             text-align: center;
-            padding: 20px;
-            background: rgba(245, 158, 11, 0.1);
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 16px 20px;
+            background: rgba(245, 158, 11, 0.15);
+            border-radius: 16px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            backdrop-filter: blur(2px);
         }
-
         .timer-display {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: bold;
             color: #f59e0b;
             font-family: monospace;
-            margin-top: 8px;
+            letter-spacing: 2px;
+            margin: 8px 0;
         }
-
-        .timer-warning {
+        .timer-warning-text {
             color: #f59e0b;
             font-size: 0.85rem;
-            margin-top: 8px;
+            font-weight: 500;
         }
-
-        .countdown-active {
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-
+        .countdown-active { animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         .destroyed-message {
-            text-align: center;
-            padding: 40px;
-            background: #fef2f2;
-            border-radius: 12px;
-            color: #dc2626;
+            text-align: center; padding: 40px; background: #fef2f2; border-radius: 12px; color: #dc2626;
         }
-
-        .destroyed-message .material-icons {
-            font-size: 3rem;
-            margin-bottom: 16px;
-        }
-
-        /* Dark mode support */
+        .destroyed-message .material-icons { font-size: 3rem; margin-bottom: 16px; }
         @media (prefers-color-scheme: dark) {
-            .secure-card {
-                background: #1e293b;
-            }
-            .content-display {
-                background: #0f172a;
-            }
-            .content-title {
-                color: #f1f5f9;
-                border-bottom-color: #334155;
-            }
-            .content-body {
-                color: #cbd5e1;
-            }
-            label {
-                color: #f1f5f9;
-            }
-            .footer {
-                background: #0f172a;
-                color: #94a3b8;
-                border-top-color: #334155;
-            }
-            .info-box {
-                background: #1e293b;
-                color: #93c5fd;
-            }
-            .photo-card {
-                background: #0f172a;
-            }
-            .photo-name {
-                color: #f1f5f9;
-            }
-            .destroyed-message {
-                background: #2d1a1a;
-            }
+            .secure-card { background: #1e293b; }
+            .content-display { background: #0f172a; }
+            .content-title { color: #f1f5f9; border-bottom-color: #334155; }
+            .content-body { color: #cbd5e1; }
+            label { color: #f1f5f9; }
+            .footer { background: #0f172a; color: #94a3b8; border-top-color: #334155; }
+            .info-box { background: #1e293b; color: #93c5fd; }
+            .photo-card { background: #0f172a; }
+            .photo-name { color: #f1f5f9; }
+            .destroyed-message { background: #2d1a1a; }
         }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .content-area {
-                padding: 20px;
-            }
-            .photo-gallery {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 12px;
-            }
-            .content-title {
-                font-size: 1.2rem;
-                flex-direction: column;
-                text-align: center;
-            }
-            .timer-display {
-                font-size: 1.8rem;
-            }
+            .content-area { padding: 20px; }
+            .photo-gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+            .content-title { font-size: 1.2rem; flex-direction: column; text-align: center; }
+            .timer-display { font-size: 1.8rem; }
+        }
+        .view-once-warning-banner {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="secure-card">
-            <div class="header">
-                <h1>🔒 PriBox Secure Content</h1>
-                <p>Secure sharing made simple</p>
-            </div>
-
-            <div class="content-area">
-                <div id="unlockSection">
-                    <div id="openAccessMessage" style="display: none;">
-                        <div class="open-icon">🔓</div>
-                        <div class="info-box" style="text-align: center;">
-                            This content is open access. Click the button below to view.
+<div class="container">
+    <div class="secure-card">
+        <div class="header">
+            <h1>🔒 PriBox Secure Content</h1>
+            <p>Secure sharing made simple</p>
+        </div>
+        <div class="content-area">
+            <div id="unlockSection">
+                <div id="openAccessMessage" style="display: none;">
+                    <div class="open-icon">🔓</div>
+                    <div class="info-box" style="text-align: center;">
+                        This content is open access. Click the button below to view.
+                    </div>
+                    <button id="viewOpenContentBtn">View Content</button>
+                </div>
+                <div id="passwordAccessMessage" style="display: none;">
+                    <div class="lock-icon">🔐</div>
+                    <div class="password-form">
+                        <div class="form-group">
+                            <label>Enter Password to Access</label>
+                            <input type="password" id="passwordInput" placeholder="Content password" autocomplete="off">
                         </div>
-                        <button id="viewOpenContentBtn">View Content</button>
-                    </div>
-                    <div id="passwordAccessMessage" style="display: none;">
-                        <div class="lock-icon">🔐</div>
-                        <div class="password-form">
-                            <div class="form-group">
-                                <label>Enter Password to Access</label>
-                                <input type="password" id="passwordInput" placeholder="Content password" autocomplete="off">
-                            </div>
-                            <button id="unlockBtn">Unlock Content</button>
-                        </div>
-                    </div>
-                    <div id="errorMessage" class="error-message"></div>
-                </div>
-
-                <div id="contentSection" style="display: none;">
-                    <div id="contentDisplay">
-                        <!-- Content will be shown here -->
-                    </div>
-                    <div class="button-group">
-                        <button id="backToUnlockBtn" class="btn-secondary">← Lock & Go Back</button>
+                        <button id="unlockBtn">Unlock Content</button>
                     </div>
                 </div>
-
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
+                <div id="errorMessage" class="error-message"></div>
+            </div>
+            <div id="contentSection" style="display: none;">
+                <div id="contentDisplay"></div>
+                <div class="button-group">
+                    <button id="backToUnlockBtn" class="btn-secondary">← Lock & Go Back</button>
                 </div>
             </div>
-
-            <div class="footer">
-                <span>🔒 Secure sharing</span>
-                <span class="security-badge">Powered by PriBox</span>
-            </div>
+            <div class="loading" id="loading"><div class="spinner"></div></div>
+        </div>
+        <div class="footer">
+            <span>🔒 Secure sharing</span>
+            <span class="security-badge">Powered by PriBox</span>
         </div>
     </div>
-
-    <!-- Photo Modal for full-size viewing -->
-    <div id="photoModal" class="photo-modal">
-        <span class="photo-modal-close">&times;</span>
-        <img id="modalImage" src="" alt="">
-        <div class="photo-modal-nav">
-            <button id="prevPhotoBtn">← Previous</button>
-            <span id="photoCounter" class="photo-counter"></span>
-            <button id="nextPhotoBtn">Next →</button>
-        </div>
+</div>
+<div id="photoModal" class="photo-modal">
+    <span class="photo-modal-close">&times;</span>
+    <img id="modalImage" src="" alt="">
+    <div class="photo-modal-nav">
+        <button id="prevPhotoBtn">← Previous</button>
+        <span id="photoCounter" class="photo-counter"></span>
+        <button id="nextPhotoBtn">Next →</button>
     </div>
+</div>
 
-    <script>
-        // Firebase configuration
-        const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
-        
-        // Get parameters from URL - only need the link ID now
-        const urlParams = new URLSearchParams(window.location.search);
-        const linkId = urlParams.get('id');
-        
-        let linkData = null;
-        let viewIncremented = false;
-        let currentPhotoIndex = 0;
-        let currentPhotos = [];
-        let countdownInterval = null;
-        let isContentDisplayed = false;
-        let isDestroyed = false;
-        
-        // SHA-256 hash function
-        async function hashPassword(password) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(password);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-        
-        // Fetch data from Firebase
-        async function getData(path) {
-            try {
-                const response = await fetch(`${DB_URL}/${path}.json`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                return data;
-            } catch (err) {
-                console.error('Fetch error:', err);
-                return null;
-            }
-        }
-        
-        // Update data in Firebase
-        async function putData(path, data) {
-            try {
-                const response = await fetch(`${DB_URL}/${path}.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                return response.ok;
-            } catch (err) {
-                console.error('PUT error:', err);
-                return false;
-            }
-        }
-        
-        // Update view count in Firebase (only once per successful view)
-        async function incrementViews() {
-            if (viewIncremented) {
-                console.log("View already counted for this session");
-                return;
-            }
-            
-            try {
-                const currentViews = linkData.views || 0;
-                const newViews = currentViews + 1;
-                const path = `shareLinks/${linkId}/views`;
-                
-                const response = await fetch(`${DB_URL}/${path}.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newViews)
-                });
-                
-                if (response.ok) {
-                    linkData.views = newViews;
-                    viewIncremented = true;
-                    console.log(`View count updated: ${newViews}`);
-                }
-            } catch (err) {
-                console.error("View increment error:", err);
-            }
-        }
-        
-        // Destroy a view-once link permanently
-        async function destroyViewOnceLink() {
-            if (!linkData || !linkData.viewOnce || linkData.isDestroyed) return;
-            
-            console.log("Destroying view-once link...");
-            
-            try {
-                // Mark as destroyed in the database
-                const destroyed = await putData(`shareLinks/${linkId}/isDestroyed`, true);
-                
-                if (destroyed) {
-                    linkData.isDestroyed = true;
-                    isDestroyed = true;
-                    console.log("View-once link destroyed successfully");
-                }
-            } catch (err) {
-                console.error("Error destroying view-once link:", err);
-            }
-        }
-        
-// Start countdown timer for view-once content with custom seconds
-function startViewOnceCountdown(callback) {
-    // Get custom seconds from linkData (default 3 if not set)
-    let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 5) 
-        ? linkData.viewOnceSeconds 
-        : 3;
+<script>
+    const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
+    const urlParams = new URLSearchParams(window.location.search);
+    const linkId = urlParams.get('id');
     
-    const timerContainer = document.createElement('div');
-    timerContainer.className = 'timer-container';
-    timerContainer.innerHTML = `
-        <div class="timer-warning">⚠️ This content is in VIEW ONCE mode!</div>
-        <div class="timer-display countdown-active">00:${secondsLeft.toString().padStart(2, '0')}</div>
-        <div class="timer-warning">Content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}</div>
-    `;
+    let linkData = null;
+    let viewIncremented = false;
+    let currentPhotoIndex = 0;
+    let currentPhotos = [];
+    let countdownInterval = null;
+    let isContentDisplayed = false;
+    let isDestroyed = false;
     
-    // Insert timer at the top of content display
-    const contentDisplay = document.getElementById('contentDisplay');
-    contentDisplay.insertBefore(timerContainer, contentDisplay.firstChild);
+    async function hashPassword(password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
     
-    countdownInterval = setInterval(() => {
-        secondsLeft--;
-        const timerDisplay = timerContainer.querySelector('.timer-display');
-        
-        if (secondsLeft <= 0) {
-            clearInterval(countdownInterval);
-            timerDisplay.textContent = "00:00";
-            timerDisplay.classList.remove('countdown-active');
-            timerContainer.style.background = 'rgba(220, 38, 38, 0.1)';
-            timerContainer.style.borderColor = '#dc2626';
-            timerContainer.querySelector('.timer-warning').innerHTML = '💀 Content has been permanently destroyed!';
-            
-            // Destroy the content
-            destroyViewOnceLink().then(() => {
-                // Replace content with destroyed message
-                contentDisplay.innerHTML = `
-                    <div class="destroyed-message">
-                        <div style="font-size: 3rem; margin-bottom: 16px;">💀</div>
-                        <h3 style="margin-bottom: 12px;">Content Destroyed</h3>
-                        <p>This content was set to "View Once" mode and has been permanently destroyed after ${originalSeconds} seconds.</p>
-                        <p style="margin-top: 12px; font-size: 0.85rem;">The link is no longer valid for future access.</p>
-                    </div>
-                `;
-                
-                // Disable further interactions
-                const backBtn = document.getElementById('backToUnlockBtn');
-                if (backBtn) {
-                    backBtn.disabled = true;
-                    backBtn.style.opacity = '0.5';
-                }
+    async function getData(path) {
+        try {
+            const response = await fetch(`${DB_URL}/${path}.json`);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+        } catch (err) { console.error('Fetch error:', err); return null; }
+    }
+    
+    async function putData(path, data) {
+        try {
+            const response = await fetch(`${DB_URL}/${path}.json`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
             });
-            
-            if (callback) callback();
-        } else {
-            const minutes = Math.floor(secondsLeft / 60);
-            const secs = secondsLeft % 60;
-            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            
-            // Add warning classes when time is low
-            if (secondsLeft <= 2) {
-                timerDisplay.style.color = '#dc2626';
-                timerDisplay.style.animation = 'pulse 0.5s infinite';
-            }
-        }
-    }, 1000);
+            return response.ok;
+        } catch (err) { console.error('PUT error:', err); return false; }
+    }
     
-    // Store original seconds for the destruction message
-    const originalSeconds = secondsLeft;
-}
-
-// Also update the displayContent function to pass the custom seconds to timer
-async function displayContent() {
-    if (isContentDisplayed) return;
+    async function incrementViews() {
+        if (viewIncremented) return;
+        try {
+            const currentViews = linkData.views || 0;
+            const newViews = currentViews + 1;
+            const path = `shareLinks/${linkId}/views`;
+            const response = await fetch(`${DB_URL}/${path}.json`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newViews)
+            });
+            if (response.ok) { linkData.views = newViews; viewIncremented = true; }
+        } catch (err) { console.error("View increment error:", err); }
+    }
     
-    try {
+    async function destroyViewOnceLink() {
+        if (!linkData || !linkData.viewOnce || linkData.isDestroyed) return;
+        try {
+            const destroyed = await putData(`shareLinks/${linkId}/isDestroyed`, true);
+            if (destroyed) { linkData.isDestroyed = true; isDestroyed = true; }
+        } catch (err) { console.error("Error destroying view-once link:", err); }
+    }
+    
+    // Unified timer with a single warning block (no duplicate)
+    function startViewOnceCountdown(callback) {
+        let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 5) 
+            ? linkData.viewOnceSeconds : 3;
+        const originalSeconds = secondsLeft;
+        
+        const timerContainer = document.createElement('div');
+        timerContainer.className = 'timer-container';
+        // SINGLE WARNING: only one warning block inside timer container
+        timerContainer.innerHTML = `
+            <div class="timer-warning-text">⚠️ VIEW ONCE MODE ACTIVE</div>
+            <div class="timer-display countdown-active">00:${secondsLeft.toString().padStart(2, '0')}</div>
+            <div class="timer-warning-text">⏳ Content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}</div>
+        `;
+        
         const contentDisplay = document.getElementById('contentDisplay');
-        const contentType = linkData.type || 'text';
+        // Remove any existing timer to avoid duplication (safety)
+        const existingTimer = contentDisplay.querySelector('.timer-container');
+        if (existingTimer) existingTimer.remove();
+        contentDisplay.insertBefore(timerContainer, contentDisplay.firstChild);
         
-        let html = '';
-        if (contentType === 'photos') {
-            html = displayPhotoContent();
-        } else {
-            html = displayTextContent();
-        }
-        
-        contentDisplay.innerHTML = html;
-        
-        // Hide unlock section, show content
-        document.getElementById('unlockSection').style.display = 'none';
-        document.getElementById('contentSection').style.display = 'block';
-        
-        isContentDisplayed = true;
-        
-        // Clear password from memory
-        const passwordInput = document.getElementById('passwordInput');
-        if (passwordInput) {
-            passwordInput.value = '';
-        }
-        
-        // Attach photo click events
-        if (contentType === 'photos') {
-            attachPhotoClickEvents();
-        }
-        
-        // Start countdown for view-once links with custom seconds
-        if (linkData.viewOnce && !linkData.isDestroyed) {
-            startViewOnceCountdown();
-        }
-        
-    } catch (err) {
-        console.error("Display error:", err);
-        showError(`Error displaying content: ${err.message}`);
-    }
-}
-
-        // Reset to unlock state
-        function resetToUnlock() {
-            // Clear any active countdown
-            if (countdownInterval) {
+        countdownInterval = setInterval(() => {
+            secondsLeft--;
+            const timerDisplay = timerContainer.querySelector('.timer-display');
+            if (secondsLeft <= 0) {
                 clearInterval(countdownInterval);
-                countdownInterval = null;
-            }
-            
-            document.getElementById('contentDisplay').innerHTML = '';
-            document.getElementById('contentSection').style.display = 'none';
-            document.getElementById('unlockSection').style.display = 'block';
-            
-            const passwordInput = document.getElementById('passwordInput');
-            if (passwordInput) {
-                passwordInput.value = '';
-            }
-            
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.style.display = 'none';
-            errorDiv.textContent = '';
-            
-            isContentDisplayed = false;
-            isDestroyed = false;
-            
-            // Reset photo modal
-            closePhotoModal();
-            
-            // Show the appropriate access message based on link type
-            if (linkData) {
-                // Check if view-once link is already destroyed
-                if (linkData.viewOnce && linkData.isDestroyed) {
-                    showError('This link has been destroyed because it was in "View Once" mode and has already been viewed.', true);
-                    return;
-                }
-                showAccessMessage();
-            }
-        }
-        
-        // Show the appropriate access message based on link type
-        function showAccessMessage() {
-            const openAccessDiv = document.getElementById('openAccessMessage');
-            const passwordAccessDiv = document.getElementById('passwordAccessMessage');
-            
-            if (linkData.hasPassword) {
-                openAccessDiv.style.display = 'none';
-                passwordAccessDiv.style.display = 'block';
-            } else {
-                openAccessDiv.style.display = 'block';
-                passwordAccessDiv.style.display = 'none';
-            }
-            
-            // Add view-once warning to access message if applicable
-            if (linkData.viewOnce && !linkData.isDestroyed) {
-                const infoBox = document.querySelector('#openAccessMessage .info-box, #passwordAccessMessage .info-box');
-                if (infoBox) {
-                    const existingWarning = infoBox.querySelector('.view-once-warning');
-                    if (!existingWarning) {
-                        const warningSpan = document.createElement('div');
-                        warningSpan.className = 'view-once-warning';
-                        warningSpan.style.marginTop = '10px';
-                        warningSpan.style.padding = '8px';
-                        warningSpan.style.background = 'rgba(245, 158, 11, 0.2)';
-                        warningSpan.style.borderRadius = '8px';
-                        warningSpan.style.fontSize = '0.8rem';
-                        warningSpan.innerHTML = '⚠️ <strong>View Once Mode:</strong> This content will be visible for only 10 seconds after first view, then permanently destroyed!';
-                        infoBox.appendChild(warningSpan);
-                    }
-                }
-            }
-        }
-        
-        // Load link data - now using only linkId
-// Add this helper function to content.html
-function isLinkAccessible(linkData) {
-    if (!linkData) return false;
-    if (linkData.status === 'pending') return false;
-    if (linkData.isDestroyed) return false;
-    if (linkData.expiration && new Date(linkData.expiration) < new Date()) return false;
-    return true;
-}
-
-// Update the loadLink function, after checking view-once destruction, add status check:
-async function loadLink() {
-    if (!linkId) {
-        showError('Invalid link. No content ID provided.', true);
-        return;
-    }
-    
-    document.getElementById('loading').style.display = 'block';
-    
-    try {
-        const path = `shareLinks/${linkId}`;
-        linkData = await getData(path);
-        
-        if (!linkData) {
-            showError('Link not found or has been deleted.', true);
-            return;
-        }
-        
-        console.log("Link loaded:", {
-            id: linkData.id,
-            title: linkData.title,
-            type: linkData.type || 'text',
-            hasPassword: linkData.hasPassword,
-            views: linkData.views || 0,
-            photoCount: linkData.photoCount || 0,
-            ownerEmail: linkData.ownerEmail || 'Unknown',
-            viewOnce: linkData.viewOnce || false,
-            isDestroyed: linkData.isDestroyed || false,
-            status: linkData.status || 'active'
-        });
-        
-        // Check if link is accessible (active, not destroyed, not expired)
-        if (!isLinkAccessible(linkData)) {
-            if (linkData.status === 'pending') {
-                showError('This link is currently pending and not accessible. Please contact the owner to activate it.', true);
-            } else if (linkData.isDestroyed) {
-                showError('This link has been destroyed and is no longer accessible.', true);
-            } else if (linkData.expiration && new Date(linkData.expiration) < new Date()) {
-                showError('This link has expired.', true);
-            } else {
-                showError('This link is not accessible.', true);
-            }
-            
-            document.getElementById('unlockSection').style.display = 'none';
-            document.getElementById('contentSection').style.display = 'block';
-            document.getElementById('contentDisplay').innerHTML = `
-                <div class="destroyed-message">
-                    <div style="font-size: 3rem; margin-bottom: 16px;">⛔</div>
-                    <h3 style="margin-bottom: 12px;">Content Not Accessible</h3>
-                    <p>${linkData.status === 'pending' ? 'This link is currently pending and not yet active.' : 'This link is no longer available.'}</p>
-                    <p style="margin-top: 12px; font-size: 0.85rem;">Please contact the owner for more information.</p>
-                </div>
-            `;
-            document.getElementById('loading').style.display = 'none';
-            return;
-        }
-        
-        // Check if view-once link is destroyed
-        if (linkData.viewOnce && linkData.isDestroyed) {
-            showError('This link has been destroyed because it was in "View Once" mode and has already been viewed.', true);
-            document.getElementById('unlockSection').style.display = 'none';
-            document.getElementById('contentSection').style.display = 'block';
-            document.getElementById('contentDisplay').innerHTML = `
-                <div class="destroyed-message">
-                    <div style="font-size: 3rem; margin-bottom: 16px;">💀</div>
-                    <h3 style="margin-bottom: 12px;">Content Destroyed</h3>
-                    <p>This content was set to "View Once" mode and has already been viewed and destroyed.</p>
-                    <p style="margin-top: 12px; font-size: 0.85rem;">The link is no longer valid for access.</p>
-                </div>
-            `;
-            document.getElementById('loading').style.display = 'none';
-            return;
-        }
-        
-        // Check expiration
-        if (linkData.expiration) {
-            const expDate = new Date(linkData.expiration);
-            if (expDate < new Date()) {
-                showError('This link has expired.', true);
-                return;
-            }
-        }
-        
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('unlockSection').style.display = 'block';
-        
-        // Show appropriate access message
-        showAccessMessage();
-        
-    } catch (err) {
-        console.error('Load error:', err);
-        showError(`Error loading content: ${err.message}`, true);
-    } finally {
-        document.getElementById('loading').style.display = 'none';
-    }
-}
-
-        // View open access content (no password)
-        async function viewOpenContent() {
-            if (isContentDisplayed) return;
-            
-            document.getElementById('loading').style.display = 'block';
-            
-            try {
-                await incrementViews();
-                await displayContent();
-                
-                // Start countdown for view-once links
-                if (linkData.viewOnce && !linkData.isDestroyed) {
-                    startViewOnceCountdown();
-                }
-            } catch (err) {
-                console.error("View error:", err);
-                showError(`Error: ${err.message}`);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-            }
-        }
-        
-        // Verify password and display content
-        async function verifyAndUnlock() {
-            if (isContentDisplayed) return;
-            
-            const password = document.getElementById('passwordInput').value;
-            
-            if (!password) {
-                showError('Please enter the password.');
-                return;
-            }
-            
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('unlockBtn').disabled = true;
-            
-            try {
-                const enteredHash = await hashPassword(password);
-                
-                if (enteredHash === linkData.passwordHash) {
-                    await incrementViews();
-                    await displayContent();
-                    
-                    // Start countdown for view-once links
-                    if (linkData.viewOnce && !linkData.isDestroyed) {
-                        startViewOnceCountdown();
-                    }
-                } else {
-                    showError('Incorrect password. Please try again.');
-                    document.getElementById('passwordInput').value = '';
-                    document.getElementById('passwordInput').focus();
-                }
-            } catch (err) {
-                console.error("Unlock error:", err);
-                showError(`Error: ${err.message}`);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('unlockBtn').disabled = false;
-            }
-        }
-        
-        // Display text content
-        function displayTextContent() {
-            const content = linkData.content || 'No content available.';
-            const title = linkData.title || 'Untitled';
-            
-            let viewOnceBadge = '';
-            if (linkData.viewOnce) {
-                viewOnceBadge = '<span class="security-badge badge-viewonce">🔥 View Once</span>';
-            }
-            
-            return `
-                <div class="content-display">
-                    <div class="content-title">
-                        📄 ${escapeHtml(title)}
-                        <div>
-                            <span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">
-                                ${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}
-                            </span>
-                            ${viewOnceBadge}
+                timerDisplay.textContent = "00:00";
+                timerDisplay.classList.remove('countdown-active');
+                timerContainer.style.background = 'rgba(220, 38, 38, 0.2)';
+                timerContainer.style.borderColor = '#dc2626';
+                timerContainer.querySelector('.timer-warning-text').innerHTML = '💀 Content has been permanently destroyed!';
+                destroyViewOnceLink().then(() => {
+                    contentDisplay.innerHTML = `
+                        <div class="destroyed-message">
+                            <div style="font-size: 3rem; margin-bottom: 16px;">💀</div>
+                            <h3 style="margin-bottom: 12px;">Content Destroyed</h3>
+                            <p>This content was set to "View Once" mode and has been permanently destroyed after ${originalSeconds} seconds.</p>
+                            <p style="margin-top: 12px; font-size: 0.85rem;">The link is no longer valid for future access.</p>
                         </div>
-                    </div>
-                    <div class="content-body">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
-                    ${getExpirationHTML()}
-                    ${getViewCountHTML()}
-                    ${getOwnerHTML()}
-                </div>
-            `;
-        }
-        
-        // Display photo gallery
-        function displayPhotoContent() {
-            const photos = linkData.photos || [];
-            const title = linkData.title || 'Shared Photos';
-            
-            let viewOnceBadge = '';
-            if (linkData.viewOnce) {
-                viewOnceBadge = '<span class="security-badge badge-viewonce">🔥 View Once</span>';
-            }
-            
-            if (photos.length === 0) {
-                return `
-                    <div class="content-display">
-                        <div class="content-title">
-                            📷 ${escapeHtml(title)}
-                            <div>
-                                <span class="security-badge badge-photos">📷 Photos</span>
-                                <span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">
-                                    ${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}
-                                </span>
-                                ${viewOnceBadge}
-                            </div>
-                        </div>
-                        <div class="content-body">No photos available.</div>
-                        ${getExpirationHTML()}
-                        ${getViewCountHTML()}
-                        ${getOwnerHTML()}
-                    </div>
-                `;
-            }
-            
-            currentPhotos = photos;
-            
-            let galleryHTML = `
-                <div class="content-display">
-                    <div class="content-title">
-                        📷 ${escapeHtml(title)}
-                        <div>
-                            <span class="security-badge badge-photos">📷 ${photos.length} Photo${photos.length !== 1 ? 's' : ''}</span>
-                            <span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">
-                                ${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}
-                            </span>
-                            ${viewOnceBadge}
-                        </div>
-                    </div>
-                    <div class="photo-gallery">
-            `;
-            
-            photos.forEach((photo, index) => {
-                galleryHTML += `
-                    <div class="photo-card" data-photo-index="${index}">
-                        <img src="${photo.url}" alt="${escapeHtml(photo.name)}" loading="lazy">
-                        <div class="photo-info">
-                            <div class="photo-name">${escapeHtml(photo.name)}</div>
-                            <div class="photo-meta">${photo.size || ''} • ${photo.date || ''}</div>
-                            ${photo.description ? `<div class="photo-meta">📝 ${escapeHtml(photo.description.substring(0, 50))}</div>` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            galleryHTML += `
-                    </div>
-                    ${getExpirationHTML()}
-                    ${getViewCountHTML()}
-                    ${getOwnerHTML()}
-                </div>
-            `;
-            
-            return galleryHTML;
-        }
-        
-        function getExpirationHTML() {
-            if (linkData.expiration) {
-                return `
-                    <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b;">
-                        ⏰ This link expires on: ${new Date(linkData.expiration).toLocaleString()}
-                    </div>
-                `;
-            }
-            return '';
-        }
-        
-        function getViewCountHTML() {
-            return `
-                <div class="view-count">
-                    👁️ Viewed ${linkData.views || 0} time${(linkData.views || 0) !== 1 ? 's' : ''}
-                </div>
-            `;
-        }
-        
-        function getOwnerHTML() {
-            if (linkData.ownerEmail) {
-                return `
-                    <div class="view-count" style="margin-top: 5px;">
-                        📧 Shared by: ${escapeHtml(linkData.ownerEmail)}
-                    </div>
-                `;
-            }
-            return '';
-        }
-        
-        // Attach click events to photo cards for full-size viewing
-        function attachPhotoClickEvents() {
-            const photoCards = document.querySelectorAll('.photo-card');
-            const modal = document.getElementById('photoModal');
-            const modalImg = document.getElementById('modalImage');
-            const prevBtn = document.getElementById('prevPhotoBtn');
-            const nextBtn = document.getElementById('nextPhotoBtn');
-            const counter = document.getElementById('photoCounter');
-            
-            photoCards.forEach(card => {
-                card.addEventListener('click', (e) => {
-                    const index = parseInt(card.getAttribute('data-photo-index'));
-                    if (!isNaN(index)) {
-                        openPhotoModal(index);
-                    }
+                    `;
+                    const backBtn = document.getElementById('backToUnlockBtn');
+                    if (backBtn) { backBtn.disabled = true; backBtn.style.opacity = '0.5'; }
                 });
-            });
-            
-            // Modal navigation
-            if (prevBtn) {
-                prevBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    navigatePhoto(-1);
-                };
-            }
-            
-            if (nextBtn) {
-                nextBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    navigatePhoto(1);
-                };
-            }
-            
-            // Close modal on click outside or close button
-            modal.onclick = (e) => {
-                if (e.target === modal || e.target.classList.contains('photo-modal-close')) {
-                    closePhotoModal();
+                if (callback) callback();
+            } else {
+                const minutes = Math.floor(secondsLeft / 60);
+                const secs = secondsLeft % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                if (secondsLeft <= 2) {
+                    timerDisplay.style.color = '#dc2626';
+                    timerDisplay.style.animation = 'pulse 0.5s infinite';
                 }
-            };
-            
-            // Keyboard navigation
-            document.addEventListener('keydown', (e) => {
-                if (modal.classList.contains('active')) {
-                    if (e.key === 'Escape') {
-                        closePhotoModal();
-                    } else if (e.key === 'ArrowLeft') {
-                        navigatePhoto(-1);
-                    } else if (e.key === 'ArrowRight') {
-                        navigatePhoto(1);
-                    }
-                }
-            });
-        }
-        
-        function openPhotoModal(index) {
-            if (!currentPhotos.length) return;
-            
-            currentPhotoIndex = Math.min(Math.max(0, index), currentPhotos.length - 1);
-            const photo = currentPhotos[currentPhotoIndex];
-            
-            const modal = document.getElementById('photoModal');
-            const modalImg = document.getElementById('modalImage');
-            const counter = document.getElementById('photoCounter');
-            
-            modalImg.src = photo.url;
-            modalImg.alt = photo.name;
-            
-            if (counter) {
-                counter.textContent = `${currentPhotoIndex + 1} of ${currentPhotos.length}`;
+                const warningMsg = timerContainer.querySelectorAll('.timer-warning-text')[1];
+                if (warningMsg) warningMsg.textContent = `⏳ Content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}`;
             }
-            
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function navigatePhoto(direction) {
-            if (!currentPhotos.length) return;
-            
-            const newIndex = currentPhotoIndex + direction;
-            if (newIndex >= 0 && newIndex < currentPhotos.length) {
-                currentPhotoIndex = newIndex;
-                const photo = currentPhotos[currentPhotoIndex];
-                const modalImg = document.getElementById('modalImage');
-                const counter = document.getElementById('photoCounter');
-                
-                modalImg.src = photo.url;
-                modalImg.alt = photo.name;
-                
-                if (counter) {
-                    counter.textContent = `${currentPhotoIndex + 1} of ${currentPhotos.length}`;
-                }
+        }, 1000);
+    }
+    
+    async function displayContent() {
+        if (isContentDisplayed) return;
+        try {
+            const contentDisplay = document.getElementById('contentDisplay');
+            const contentType = linkData.type || 'text';
+            let html = '';
+            if (contentType === 'photos') html = displayPhotoContent();
+            else html = displayTextContent();
+            contentDisplay.innerHTML = html;
+            document.getElementById('unlockSection').style.display = 'none';
+            document.getElementById('contentSection').style.display = 'block';
+            isContentDisplayed = true;
+            if (document.getElementById('passwordInput')) document.getElementById('passwordInput').value = '';
+            if (contentType === 'photos') attachPhotoClickEvents();
+            // View Once timer starts only once and there's no duplicate warning because the only warning is inside timer container.
+            if (linkData.viewOnce && !linkData.isDestroyed) {
+                startViewOnceCountdown();
             }
-        }
-        
-        function closePhotoModal() {
-            const modal = document.getElementById('photoModal');
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        // Show error message
-        function showError(message, isFatal = false) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            
-            if (isFatal) {
-                const unlockBtn = document.getElementById('unlockBtn');
-                const viewOpenBtn = document.getElementById('viewOpenContentBtn');
-                const passwordInput = document.getElementById('passwordInput');
-                if (unlockBtn) unlockBtn.disabled = true;
-                if (viewOpenBtn) viewOpenBtn.disabled = true;
-                if (passwordInput) passwordInput.disabled = true;
-            }
-            
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Helper to escape HTML
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        // Event listeners
-        const unlockBtn = document.getElementById('unlockBtn');
+        } catch (err) { console.error("Display error:", err); showError(`Error displaying content: ${err.message}`); }
+    }
+    
+    function resetToUnlock() {
+        if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+        document.getElementById('contentDisplay').innerHTML = '';
+        document.getElementById('contentSection').style.display = 'none';
+        document.getElementById('unlockSection').style.display = 'block';
         const passwordInput = document.getElementById('passwordInput');
-        const viewOpenContentBtn = document.getElementById('viewOpenContentBtn');
-        const backToUnlockBtn = document.getElementById('backToUnlockBtn');
-        
-        if (unlockBtn) {
-            unlockBtn.addEventListener('click', verifyAndUnlock);
+        if (passwordInput) passwordInput.value = '';
+        const errorDiv = document.getElementById('errorMessage');
+        errorDiv.style.display = 'none'; errorDiv.textContent = '';
+        isContentDisplayed = false; isDestroyed = false;
+        closePhotoModal();
+        if (linkData) {
+            if (linkData.viewOnce && linkData.isDestroyed) {
+                showError('This link has been destroyed because it was in "View Once" mode and has already been viewed.', true);
+                document.getElementById('unlockSection').style.display = 'none';
+                document.getElementById('contentSection').style.display = 'block';
+                document.getElementById('contentDisplay').innerHTML = `
+                    <div class="destroyed-message">
+                        <div style="font-size: 3rem;">💀</div>
+                        <h3>Content Destroyed</h3>
+                        <p>This content was set to "View Once" mode and has already been viewed and destroyed.</p>
+                    </div>`;
+                return;
+            }
+            showAccessMessage();
         }
-        
-        if (passwordInput) {
-            passwordInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') verifyAndUnlock();
-            });
+    }
+    
+    function showAccessMessage() {
+        const openAccessDiv = document.getElementById('openAccessMessage');
+        const passwordAccessDiv = document.getElementById('passwordAccessMessage');
+        if (linkData.hasPassword) {
+            openAccessDiv.style.display = 'none';
+            passwordAccessDiv.style.display = 'block';
+        } else {
+            openAccessDiv.style.display = 'block';
+            passwordAccessDiv.style.display = 'none';
         }
-        
-        if (viewOpenContentBtn) {
-            viewOpenContentBtn.addEventListener('click', viewOpenContent);
+        // Single unified view-once warning inside the info box, no duplication with timer later
+        if (linkData.viewOnce && !linkData.isDestroyed) {
+            const infoBox = document.querySelector('#openAccessMessage .info-box, #passwordAccessMessage .info-box');
+            if (infoBox) {
+                const existing = infoBox.querySelector('.view-once-unified-warning');
+                if (!existing) {
+                    const warningSpan = document.createElement('div');
+                    warningSpan.className = 'view-once-unified-warning';
+                    warningSpan.style.marginTop = '10px';
+                    warningSpan.style.padding = '8px';
+                    warningSpan.style.background = 'rgba(245, 158, 11, 0.2)';
+                    warningSpan.style.borderRadius = '8px';
+                    warningSpan.style.fontSize = '0.8rem';
+                    warningSpan.innerHTML = '⚠️ <strong>View Once Mode:</strong> This content will be visible for only a few seconds after first view, then permanently destroyed!';
+                    infoBox.appendChild(warningSpan);
+                }
+            }
         }
-        
-        if (backToUnlockBtn) {
-            backToUnlockBtn.addEventListener('click', resetToUnlock);
-        }
-        
-        // Initialize
-        loadLink();
-    </script>
+    }
+    
+    function isLinkAccessible(linkData) {
+        if (!linkData) return false;
+        if (linkData.status === 'pending') return false;
+        if (linkData.isDestroyed) return false;
+        if (linkData.expiration && new Date(linkData.expiration) < new Date()) return false;
+        return true;
+    }
+    
+    async function loadLink() {
+        if (!linkId) { showError('Invalid link. No content ID provided.', true); return; }
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const path = `shareLinks/${linkId}`;
+            linkData = await getData(path);
+            if (!linkData) { showError('Link not found or has been deleted.', true); return; }
+            if (!isLinkAccessible(linkData)) {
+                if (linkData.status === 'pending') showError('This link is currently pending and not accessible.', true);
+                else if (linkData.isDestroyed) showError('This link has been destroyed and is no longer accessible.', true);
+                else if (linkData.expiration && new Date(linkData.expiration) < new Date()) showError('This link has expired.', true);
+                else showError('This link is not accessible.', true);
+                document.getElementById('unlockSection').style.display = 'none';
+                document.getElementById('contentSection').style.display = 'block';
+                document.getElementById('contentDisplay').innerHTML = `<div class="destroyed-message"><div style="font-size: 3rem;">⛔</div><h3>Content Not Accessible</h3><p>Link unavailable.</p></div>`;
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+            if (linkData.viewOnce && linkData.isDestroyed) {
+                showError('This link has been destroyed because it was in "View Once" mode and has already been viewed.', true);
+                document.getElementById('unlockSection').style.display = 'none';
+                document.getElementById('contentSection').style.display = 'block';
+                document.getElementById('contentDisplay').innerHTML = `<div class="destroyed-message"><div style="font-size: 3rem;">💀</div><h3>Content Destroyed</h3><p>View Once content already destroyed.</p></div>`;
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+            if (linkData.expiration && new Date(linkData.expiration) < new Date()) { showError('This link has expired.', true); return; }
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('unlockSection').style.display = 'block';
+            showAccessMessage();
+        } catch (err) { console.error('Load error:', err); showError(`Error loading content: ${err.message}`, true); }
+        finally { document.getElementById('loading').style.display = 'none'; }
+    }
+    
+    async function viewOpenContent() {
+        if (isContentDisplayed) return;
+        document.getElementById('loading').style.display = 'block';
+        try { await incrementViews(); await displayContent(); } 
+        catch (err) { showError(`Error: ${err.message}`); } 
+        finally { document.getElementById('loading').style.display = 'none'; }
+    }
+    
+    async function verifyAndUnlock() {
+        if (isContentDisplayed) return;
+        const password = document.getElementById('passwordInput').value;
+        if (!password) { showError('Please enter the password.'); return; }
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('unlockBtn').disabled = true;
+        try {
+            const enteredHash = await hashPassword(password);
+            if (enteredHash === linkData.passwordHash) { await incrementViews(); await displayContent(); } 
+            else { showError('Incorrect password. Please try again.'); document.getElementById('passwordInput').value = ''; document.getElementById('passwordInput').focus(); }
+        } catch (err) { console.error("Unlock error:", err); showError(`Error: ${err.message}`); } 
+        finally { document.getElementById('loading').style.display = 'none'; document.getElementById('unlockBtn').disabled = false; }
+    }
+    
+    function displayTextContent() {
+        const title = linkData.title || 'Untitled';
+        const viewOnceBadge = linkData.viewOnce ? '<span class="security-badge badge-viewonce">🔥 View Once</span>' : '';
+        return `<div class="content-display"><div class="content-title">📄 ${escapeHtml(title)}<div><span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}</span>${viewOnceBadge}</div></div><div class="content-body">${escapeHtml(linkData.content || 'No content available.').replace(/\n/g, '<br>')}</div>${getExpirationHTML()}${getViewCountHTML()}${getOwnerHTML()}</div>`;
+    }
+    
+    function displayPhotoContent() {
+        const photos = linkData.photos || [];
+        const title = linkData.title || 'Shared Photos';
+        const viewOnceBadge = linkData.viewOnce ? '<span class="security-badge badge-viewonce">🔥 View Once</span>' : '';
+        if (!photos.length) return `<div class="content-display"><div class="content-title">📷 ${escapeHtml(title)}<div><span class="security-badge badge-photos">📷 Photos</span><span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}</span>${viewOnceBadge}</div></div><div class="content-body">No photos available.</div>${getExpirationHTML()}${getViewCountHTML()}${getOwnerHTML()}</div>`;
+        currentPhotos = photos;
+        let galleryHTML = `<div class="content-display"><div class="content-title">📷 ${escapeHtml(title)}<div><span class="security-badge badge-photos">📷 ${photos.length} Photo${photos.length !== 1 ? 's' : ''}</span><span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}</span>${viewOnceBadge}</div></div><div class="photo-gallery">`;
+        photos.forEach((photo, idx) => { galleryHTML += `<div class="photo-card" data-photo-index="${idx}"><img src="${photo.url}" alt="${escapeHtml(photo.name)}" loading="lazy"><div class="photo-info"><div class="photo-name">${escapeHtml(photo.name)}</div><div class="photo-meta">${photo.size || ''} ${photo.date || ''}</div>${photo.description ? `<div class="photo-meta">📝 ${escapeHtml(photo.description.substring(0,50))}</div>` : ''}</div></div>`; });
+        galleryHTML += `</div>${getExpirationHTML()}${getViewCountHTML()}${getOwnerHTML()}</div>`;
+        return galleryHTML;
+    }
+    
+    function getExpirationHTML() { return linkData.expiration ? `<div style="margin-top:20px; padding-top:10px; border-top:1px solid #e2e8f0; font-size:0.85rem; color:#64748b;">⏰ Expires: ${new Date(linkData.expiration).toLocaleString()}</div>` : ''; }
+    function getViewCountHTML() { return `<div class="view-count">👁️ Viewed ${linkData.views || 0} time${(linkData.views || 0) !== 1 ? 's' : ''}</div>`; }
+    function getOwnerHTML() { return linkData.ownerEmail ? `<div class="view-count" style="margin-top:5px;">📧 Shared by: ${escapeHtml(linkData.ownerEmail)}</div>` : ''; }
+    
+    function attachPhotoClickEvents() {
+        document.querySelectorAll('.photo-card').forEach(card => { card.addEventListener('click', () => { const idx = parseInt(card.getAttribute('data-photo-index')); if (!isNaN(idx)) openPhotoModal(idx); }); });
+        const modal = document.getElementById('photoModal'), prev = document.getElementById('prevPhotoBtn'), next = document.getElementById('nextPhotoBtn');
+        if (prev) prev.onclick = (e) => { e.stopPropagation(); navigatePhoto(-1); };
+        if (next) next.onclick = (e) => { e.stopPropagation(); navigatePhoto(1); };
+        modal.onclick = (e) => { if (e.target === modal || e.target.classList.contains('photo-modal-close')) closePhotoModal(); };
+        document.addEventListener('keydown', (e) => { if (modal.classList.contains('active')) { if (e.key === 'Escape') closePhotoModal(); else if (e.key === 'ArrowLeft') navigatePhoto(-1); else if (e.key === 'ArrowRight') navigatePhoto(1); } });
+    }
+    function openPhotoModal(idx) { if (!currentPhotos.length) return; currentPhotoIndex = Math.min(Math.max(0, idx), currentPhotos.length-1); const photo = currentPhotos[currentPhotoIndex]; document.getElementById('modalImage').src = photo.url; document.getElementById('photoCounter').textContent = `${currentPhotoIndex+1} of ${currentPhotos.length}`; document.getElementById('photoModal').classList.add('active'); document.body.style.overflow = 'hidden'; }
+    function navigatePhoto(d) { let newIdx = currentPhotoIndex + d; if (newIdx>=0 && newIdx<currentPhotos.length) { currentPhotoIndex = newIdx; const photo = currentPhotos[currentPhotoIndex]; document.getElementById('modalImage').src = photo.url; document.getElementById('photoCounter').textContent = `${currentPhotoIndex+1} of ${currentPhotos.length}`; } }
+    function closePhotoModal() { document.getElementById('photoModal').classList.remove('active'); document.body.style.overflow = ''; }
+    function showError(msg, fatal=false) { const errDiv = document.getElementById('errorMessage'); errDiv.textContent = msg; errDiv.style.display = 'block'; if(fatal){ const btn=document.getElementById('unlockBtn'); if(btn) btn.disabled=true; const viewBtn=document.getElementById('viewOpenContentBtn'); if(viewBtn) viewBtn.disabled=true; } setTimeout(()=>{ errDiv.style.display='none'; },5000); }
+    function escapeHtml(t) { if(!t) return ''; const div=document.createElement('div'); div.textContent=t; return div.innerHTML; }
+    
+    document.getElementById('unlockBtn')?.addEventListener('click', verifyAndUnlock);
+    document.getElementById('passwordInput')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAndUnlock(); });
+    document.getElementById('viewOpenContentBtn')?.addEventListener('click', viewOpenContent);
+    document.getElementById('backToUnlockBtn')?.addEventListener('click', resetToUnlock);
+    loadLink();
+</script>
 </body>
 </html>
