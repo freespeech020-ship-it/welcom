@@ -665,68 +665,120 @@
             }
         }
         
-        // Start countdown timer for view-once content
-        function startViewOnceCountdown(callback) {
-            let secondsLeft = 10;
-            const timerContainer = document.createElement('div');
-            timerContainer.className = 'timer-container';
-            timerContainer.innerHTML = `
-                <div class="timer-warning">⚠️ This content is in VIEW ONCE mode!</div>
-                <div class="timer-display countdown-active">00:${secondsLeft.toString().padStart(2, '0')}</div>
-                <div class="timer-warning">Content will be permanently destroyed after this timer reaches zero</div>
-            `;
+// Start countdown timer for view-once content with custom seconds
+function startViewOnceCountdown(callback) {
+    // Get custom seconds from linkData (default 3 if not set)
+    let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 5) 
+        ? linkData.viewOnceSeconds 
+        : 3;
+    
+    const timerContainer = document.createElement('div');
+    timerContainer.className = 'timer-container';
+    timerContainer.innerHTML = `
+        <div class="timer-warning">⚠️ This content is in VIEW ONCE mode!</div>
+        <div class="timer-display countdown-active">00:${secondsLeft.toString().padStart(2, '0')}</div>
+        <div class="timer-warning">Content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}</div>
+    `;
+    
+    // Insert timer at the top of content display
+    const contentDisplay = document.getElementById('contentDisplay');
+    contentDisplay.insertBefore(timerContainer, contentDisplay.firstChild);
+    
+    countdownInterval = setInterval(() => {
+        secondsLeft--;
+        const timerDisplay = timerContainer.querySelector('.timer-display');
+        
+        if (secondsLeft <= 0) {
+            clearInterval(countdownInterval);
+            timerDisplay.textContent = "00:00";
+            timerDisplay.classList.remove('countdown-active');
+            timerContainer.style.background = 'rgba(220, 38, 38, 0.1)';
+            timerContainer.style.borderColor = '#dc2626';
+            timerContainer.querySelector('.timer-warning').innerHTML = '💀 Content has been permanently destroyed!';
             
-            // Insert timer at the top of content display
-            const contentDisplay = document.getElementById('contentDisplay');
-            contentDisplay.insertBefore(timerContainer, contentDisplay.firstChild);
-            
-            countdownInterval = setInterval(() => {
-                secondsLeft--;
-                const timerDisplay = timerContainer.querySelector('.timer-display');
+            // Destroy the content
+            destroyViewOnceLink().then(() => {
+                // Replace content with destroyed message
+                contentDisplay.innerHTML = `
+                    <div class="destroyed-message">
+                        <div style="font-size: 3rem; margin-bottom: 16px;">💀</div>
+                        <h3 style="margin-bottom: 12px;">Content Destroyed</h3>
+                        <p>This content was set to "View Once" mode and has been permanently destroyed after ${originalSeconds} seconds.</p>
+                        <p style="margin-top: 12px; font-size: 0.85rem;">The link is no longer valid for future access.</p>
+                    </div>
+                `;
                 
-                if (secondsLeft <= 0) {
-                    clearInterval(countdownInterval);
-                    timerDisplay.textContent = "00:00";
-                    timerDisplay.classList.remove('countdown-active');
-                    timerContainer.style.background = 'rgba(220, 38, 38, 0.1)';
-                    timerContainer.style.borderColor = '#dc2626';
-                    timerContainer.querySelector('.timer-warning').innerHTML = '💀 Content has been permanently destroyed!';
-                    
-                    // Destroy the content
-                    destroyViewOnceLink().then(() => {
-                        // Replace content with destroyed message
-                        contentDisplay.innerHTML = `
-                            <div class="destroyed-message">
-                                <div style="font-size: 3rem; margin-bottom: 16px;">💀</div>
-                                <h3 style="margin-bottom: 12px;">Content Destroyed</h3>
-                                <p>This content was set to "View Once" mode and has been permanently destroyed after 10 seconds.</p>
-                                <p style="margin-top: 12px; font-size: 0.85rem;">The link is no longer valid for future access.</p>
-                            </div>
-                        `;
-                        
-                        // Disable further interactions
-                        const backBtn = document.getElementById('backToUnlockBtn');
-                        if (backBtn) {
-                            backBtn.disabled = true;
-                            backBtn.style.opacity = '0.5';
-                        }
-                    });
-                    
-                    if (callback) callback();
-                } else {
-                    const minutes = Math.floor(secondsLeft / 60);
-                    const secs = secondsLeft % 60;
-                    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                    
-                    // Add warning classes when time is low
-                    if (secondsLeft <= 3) {
-                        timerDisplay.style.color = '#dc2626';
-                        timerDisplay.style.animation = 'pulse 0.5s infinite';
-                    }
+                // Disable further interactions
+                const backBtn = document.getElementById('backToUnlockBtn');
+                if (backBtn) {
+                    backBtn.disabled = true;
+                    backBtn.style.opacity = '0.5';
                 }
-            }, 1000);
+            });
+            
+            if (callback) callback();
+        } else {
+            const minutes = Math.floor(secondsLeft / 60);
+            const secs = secondsLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            
+            // Add warning classes when time is low
+            if (secondsLeft <= 2) {
+                timerDisplay.style.color = '#dc2626';
+                timerDisplay.style.animation = 'pulse 0.5s infinite';
+            }
+        }
+    }, 1000);
+    
+    // Store original seconds for the destruction message
+    const originalSeconds = secondsLeft;
+}
+
+// Also update the displayContent function to pass the custom seconds to timer
+async function displayContent() {
+    if (isContentDisplayed) return;
+    
+    try {
+        const contentDisplay = document.getElementById('contentDisplay');
+        const contentType = linkData.type || 'text';
+        
+        let html = '';
+        if (contentType === 'photos') {
+            html = displayPhotoContent();
+        } else {
+            html = displayTextContent();
         }
         
+        contentDisplay.innerHTML = html;
+        
+        // Hide unlock section, show content
+        document.getElementById('unlockSection').style.display = 'none';
+        document.getElementById('contentSection').style.display = 'block';
+        
+        isContentDisplayed = true;
+        
+        // Clear password from memory
+        const passwordInput = document.getElementById('passwordInput');
+        if (passwordInput) {
+            passwordInput.value = '';
+        }
+        
+        // Attach photo click events
+        if (contentType === 'photos') {
+            attachPhotoClickEvents();
+        }
+        
+        // Start countdown for view-once links with custom seconds
+        if (linkData.viewOnce && !linkData.isDestroyed) {
+            startViewOnceCountdown();
+        }
+        
+    } catch (err) {
+        console.error("Display error:", err);
+        showError(`Error displaying content: ${err.message}`);
+    }
+}
+
         // Reset to unlock state
         function resetToUnlock() {
             // Clear any active countdown
@@ -799,7 +851,7 @@
         }
         
         // Load link data - now using only linkId
-        // Add this helper function to content.html
+// Add this helper function to content.html
 function isLinkAccessible(linkData) {
     if (!linkData) return false;
     if (linkData.status === 'pending') return false;
@@ -904,7 +956,7 @@ async function loadLink() {
         document.getElementById('loading').style.display = 'none';
     }
 }
-        
+
         // View open access content (no password)
         async function viewOpenContent() {
             if (isContentDisplayed) return;
@@ -1095,46 +1147,6 @@ async function loadLink() {
                 `;
             }
             return '';
-        }
-        
-        // Display the content (text or photos)
-        async function displayContent() {
-            if (isContentDisplayed) return;
-            
-            try {
-                const contentDisplay = document.getElementById('contentDisplay');
-                const contentType = linkData.type || 'text';
-                
-                let html = '';
-                if (contentType === 'photos') {
-                    html = displayPhotoContent();
-                } else {
-                    html = displayTextContent();
-                }
-                
-                contentDisplay.innerHTML = html;
-                
-                // Hide unlock section, show content
-                document.getElementById('unlockSection').style.display = 'none';
-                document.getElementById('contentSection').style.display = 'block';
-                
-                isContentDisplayed = true;
-                
-                // Clear password from memory
-                const passwordInput = document.getElementById('passwordInput');
-                if (passwordInput) {
-                    passwordInput.value = '';
-                }
-                
-                // Attach photo click events
-                if (contentType === 'photos') {
-                    attachPhotoClickEvents();
-                }
-                
-            } catch (err) {
-                console.error("Display error:", err);
-                showError(`Error displaying content: ${err.message}`);
-            }
         }
         
         // Attach click events to photo cards for full-size viewing
