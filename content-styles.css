@@ -390,32 +390,6 @@ body {
     text-align: center;
 }
 
-.timer-warning-text {
-    color: var(--warning);
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.timer-display-pribox {
-    font-size: 2rem;
-    font-weight: 700;
-    font-family: monospace;
-    color: #f59e0b;
-    margin: 8px 0;
-}
-
-.countdown-active {
-    animation: pulseSoft 1s infinite;
-}
-
-@keyframes pulseSoft {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
-}
-
 .destroyed-message {
     text-align: center;
     padding: 12px;

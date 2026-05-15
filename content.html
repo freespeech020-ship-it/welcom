@@ -43,11 +43,11 @@
             </div>
 
             <!-- Content Display Section -->
-            <div id="contentSection" style="display: none;">
+            <div id="contentSection" style="display: none; margin-top: 8px;">
                 <div id="contentDisplay"></div>
                 <div class="button-group">
                     <button id="backToUnlockBtn" class="btn-pribox btn-secondary">
-                        <span class="material-icons">arrow_back</span> Lock & Go Back
+                        <span class="material-icons">arrow_back</span> Go Back
                     </button>
                 </div>
             </div>
@@ -168,38 +168,39 @@
         }
     }
 
-function startViewOnceCountdown(callback) {
-    let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 60) 
-        ? linkData.viewOnceSeconds : 3;
-    const originalSeconds = secondsLeft;
-    
-    // NO VISUAL TIMER DISPLAY - just silent countdown in background
-    countdownInterval = setInterval(() => {
-        secondsLeft--;
-        if (secondsLeft <= 0) {
-            clearInterval(countdownInterval);
-            // Destroy content exactly as before
-            destroyViewOnceLink().then(() => {
-                const mainDisplayDiv = document.getElementById('contentDisplay');
-                mainDisplayDiv.innerHTML = `
-                    <div class="destroyed-message">
-                        <span class="material-icons">delete_forever</span>
-                        <h3 style="margin-bottom: 12px; font-weight: 600;">Content Destroyed</h3>
-                        <p style="font-size:0.85rem;">This content was set to "View Once" mode and has been permanently destroyed.</p>
-                        <p style="font-size:0.75rem; margin-top:12px; opacity:0.7;">The secure link is no longer valid.</p>
-                    </div>
-                `;
-                const backBtn = document.getElementById('backToUnlockBtn');
-                if (backBtn) { 
-                    backBtn.disabled = true; 
-                    backBtn.style.opacity = '0.5'; 
-                    backBtn.style.cursor = 'not-allowed';
-                }
-            });
-            if (callback) callback();
-        }
-    }, 1000);
-}
+    // Unified timer - clean PriBox style
+    function startViewOnceCountdown(callback) {
+        let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 60) 
+            ? linkData.viewOnceSeconds : 3;
+        const originalSeconds = secondsLeft;
+        
+        // NO VISUAL TIMER DISPLAY - just silent countdown in background
+        countdownInterval = setInterval(() => {
+            secondsLeft--;
+            if (secondsLeft <= 0) {
+                clearInterval(countdownInterval);
+                // Destroy content exactly as before
+                destroyViewOnceLink().then(() => {
+                    const mainDisplayDiv = document.getElementById('contentDisplay');
+                    mainDisplayDiv.innerHTML = `
+                        <div class="destroyed-message">
+                            <span class="material-icons">delete_forever</span>
+                            <h3 style="margin-bottom: 12px; font-weight: 600;">Content Destroyed</h3>
+                            <p style="font-size:0.85rem;">This content was set to "View Once" mode and has been permanently destroyed.</p>
+                            <p style="font-size:0.75rem; margin-top:12px; opacity:0.7;">The secure link is no longer valid.</p>
+                        </div>
+                    `;
+                    const backBtn = document.getElementById('backToUnlockBtn');
+                    if (backBtn) { 
+                        backBtn.disabled = true; 
+                        backBtn.style.opacity = '0.5'; 
+                        backBtn.style.cursor = 'not-allowed';
+                    }
+                });
+                if (callback) callback();
+            }
+        }, 1000);
+    }
 
     // Display Content (Rich PriBox layout)
     async function displayContent() {
