@@ -4,228 +4,564 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>PriBox Secure Content - View Once</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --body-bg: #252a2c;
+            --card-bg: #2d3436;
+            --border: #3c484a;
+            --text-primary: #CCCCCC;
+            --text-secondary: #8a9499;
+            --primary: #219EBC;
+            --primary-light: #8ECAE6;
+            --success: #308671;
+            --danger: #b92d2d;
+            --warning: #bb780d;
+            --info: #2e78a7;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --radius-md: 8px;
+            --radius-lg: 12px;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--body-bg);
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
+            color: var(--text-primary);
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1280px;
             width: 100%;
             margin: 0 auto;
         }
 
-        .secure-card {
-            background: white;
-            border-radius: 20px;
+        /* PriBox Style Card */
+        .pribox-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            animation: fadeIn 0.5s ease-out;
+            animation: fadeInUp 0.4s ease-out;
+            box-shadow: var(--shadow);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .header {
-            background: linear-gradient(135deg, #219EBC 0%, #8ECAE6 100%);
-            color: white;
-            padding: 30px 40px;
-            text-align: center;
+        /* Header - matches PriBox navbar aesthetic */
+        .pribox-header {
+            background: rgba(33, 158, 188, 0.08);
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: space-between;
         }
 
-        .header h1 { font-size: 1.8rem; margin-bottom: 8px; }
-        .header p { opacity: 0.9; font-size: 0.9rem; }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        .content-area { padding: 40px; }
-        .lock-icon, .open-icon { text-align: center; font-size: 3rem; margin-bottom: 20px; }
-        .password-form { max-width: 400px; margin: 0 auto; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
-        input {
-            width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px;
-            font-size: 16px; transition: all 0.3s;
+        .header-brand .material-icons {
+            font-size: 28px;
+            color: var(--primary);
         }
-        input:focus { outline: none; border-color: #219EBC; box-shadow: 0 0 0 3px rgba(33,158,188,0.1); }
-        button {
-            width: 100%; padding: 14px; background: #219EBC; color: white; border: none;
-            border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+
+        .header-brand h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.3px;
         }
-        button:hover { background: #1a7a94; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(33,158,188,0.3); }
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
-        .content-display {
-            background: #f8fafc; border-radius: 16px; padding: 30px; margin-top: 20px;
-            animation: slideIn 0.3s ease-out;
+
+        .security-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(33, 158, 188, 0.15);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--primary-light);
         }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .content-title {
-            font-size: 1.5rem; font-weight: 600; color: #1e293b; margin-bottom: 20px;
-            padding-bottom: 10px; border-bottom: 2px solid #e2e8f0;
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+
+        .security-chip .material-icons {
+            font-size: 16px;
         }
-        .content-body { line-height: 1.6; color: #334155; white-space: pre-wrap; word-wrap: break-word; }
-        .photo-gallery {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px; margin-top: 20px;
+
+        /* Content Area */
+        .pribox-content {
+            padding: 28px;
         }
-        .photo-card {
-            background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;
-        }
-        .photo-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
-        .photo-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
-        .photo-info { padding: 12px; }
-        .photo-name { font-weight: 600; color: #1e293b; margin-bottom: 4px; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .photo-meta { font-size: 0.7rem; color: #64748b; }
-        .photo-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; cursor: pointer;
-        }
-        .photo-modal.active { display: flex; animation: fadeIn 0.3s ease; }
-        .photo-modal img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; }
-        .photo-modal-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; transition: transform 0.2s; }
-        .photo-modal-close:hover { transform: scale(1.1); }
-        .photo-modal-nav {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 15px; background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 40px;
-        }
-        .photo-modal-nav button { width: auto; padding: 8px 16px; background: #219EBC; margin: 0; }
-        .photo-modal-nav button:hover { background: #1a7a94; }
-        .photo-counter { color: white; padding: 8px 12px; font-size: 0.85rem; }
-        .error-message { background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 10px; margin-top: 15px; text-align: center; display: none; }
-        .loading { text-align: center; margin-top: 20px; display: none; }
-        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #219EBC; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .footer { padding: 20px; text-align: center; background: #f8fafc; color: #64748b; font-size: 0.85rem; border-top: 1px solid #e2e8f0; }
-        .security-badge { display: inline-block; background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; margin-left: 10px; }
-        .badge-open { background: #d1fae5; color: #065f46; }
-        .badge-password { background: #fef3c7; color: #92400e; }
-        .badge-photos { background: #e0e7ff; color: #3730a3; }
-        .badge-viewonce { background: #fed7aa; color: #9a3412; }
-        .info-box { background: #dbeafe; border-left: 4px solid #219EBC; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; color: #1e40af; }
-        .view-count { margin-top: 15px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.75rem; color: #64748b; text-align: center; }
-        .button-group { display: flex; gap: 10px; margin-top: 20px; }
-        .button-group button { flex: 1; }
-        .btn-secondary { background: #64748b; }
-        .btn-secondary:hover { background: #475569; }
-        /* Single Timer Styles - unified and clean */
-        .timer-container {
-            text-align: center;
-            padding: 16px 20px;
-            background: rgba(245, 158, 11, 0.15);
-            border-radius: 16px;
+
+        /* Info box - PriBox style */
+        .info-box-pribox {
+            background: rgba(46, 120, 167, 0.12);
+            border-left: 3px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
             margin-bottom: 24px;
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            backdrop-filter: blur(2px);
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
         }
-        .timer-display {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #f59e0b;
+
+        .info-box-pribox .material-icons {
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .warning-box {
+            background: rgba(187, 120, 13, 0.12);
+            border-left-color: var(--warning);
+        }
+
+        .warning-box .material-icons {
+            color: var(--warning);
+        }
+
+        /* Form styling - matches PriBox inputs */
+        .form-group-pribox {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .pribox-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Inter', monospace;
+            transition: all 0.2s ease;
+        }
+
+        .pribox-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(33, 158, 188, 0.2);
+        }
+
+        /* Buttons - PriBox style */
+        .btn-pribox {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: rgba(33, 158, 188, 0.85);
+            color: white;
+            border: 1px solid rgba(33, 158, 188, 0.5);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(108, 117, 125, 0.3);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(108, 117, 125, 0.5);
+        }
+
+        .btn-warning {
+            background: rgba(187, 120, 13, 0.3);
+            color: var(--warning);
+            border: 1px solid rgba(187, 120, 13, 0.4);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Content display - PriBox cards */
+        .content-display-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .content-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: rgba(33, 158, 188, 0.04);
+        }
+
+        .content-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-pribox {
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+        }
+
+        .badge-open { color: var(--success); border-color: rgba(48, 134, 113, 0.4); background: rgba(48,134,113,0.1); }
+        .badge-password { color: var(--warning); border-color: rgba(187,120,13,0.4); background: rgba(187,120,13,0.1); }
+        .badge-photos { color: var(--primary); border-color: rgba(33,158,188,0.4); background: rgba(33,158,188,0.1); }
+        .badge-viewonce { color: #f97316; border-color: rgba(249,115,22,0.4); background: rgba(249,115,22,0.1); }
+
+        .content-body-text {
+            padding: 22px;
+            line-height: 1.6;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Photo gallery - PriBox grid */
+        .photo-gallery-pribox {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+            padding: 22px;
+        }
+
+        .photo-card-pribox {
+            background: rgba(0,0,0,0.3);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border);
+        }
+
+        .photo-card-pribox:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .photo-card-pribox img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-info {
+            padding: 10px 12px;
+        }
+
+        .photo-name {
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .photo-meta {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        /* Meta footer */
+        .meta-footer {
+            padding: 16px 22px;
+            border-top: 1px solid var(--border);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: rgba(0,0,0,0.1);
+        }
+
+        /* Timer - single clean component */
+        .timer-container-pribox {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: var(--radius-md);
+            padding: 14px 20px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .timer-warning-text {
+            color: var(--warning);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .timer-display-pribox {
+            font-size: 2rem;
+            font-weight: 700;
             font-family: monospace;
-            letter-spacing: 2px;
+            color: #f59e0b;
             margin: 8px 0;
         }
-        .timer-warning-text {
-            color: #f59e0b;
-            font-size: 0.85rem;
-            font-weight: 500;
+
+        .countdown-active {
+            animation: pulseSoft 1s infinite;
         }
-        .countdown-active { animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        @keyframes pulseSoft {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
         .destroyed-message {
-            text-align: center; padding: 40px; background: #fef2f2; border-radius: 12px; color: #dc2626;
+            text-align: center;
+            padding: 40px 24px;
+            background: rgba(185, 45, 45, 0.1);
+            border-radius: var(--radius-md);
+            margin: 20px;
         }
-        .destroyed-message .material-icons { font-size: 3rem; margin-bottom: 16px; }
-        @media (prefers-color-scheme: dark) {
-            .secure-card { background: #1e293b; }
-            .content-display { background: #0f172a; }
-            .content-title { color: #f1f5f9; border-bottom-color: #334155; }
-            .content-body { color: #cbd5e1; }
-            label { color: #f1f5f9; }
-            .footer { background: #0f172a; color: #94a3b8; border-top-color: #334155; }
-            .info-box { background: #1e293b; color: #93c5fd; }
-            .photo-card { background: #0f172a; }
-            .photo-name { color: #f1f5f9; }
-            .destroyed-message { background: #2d1a1a; }
+
+        .destroyed-message .material-icons {
+            font-size: 48px;
+            color: var(--danger);
+            margin-bottom: 16px;
         }
-        @media (max-width: 768px) {
-            .content-area { padding: 20px; }
-            .photo-gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-            .content-title { font-size: 1.2rem; flex-direction: column; text-align: center; }
-            .timer-display { font-size: 1.8rem; }
+
+        /* Modal for photos - PriBox dark theme */
+        .photo-modal-pribox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
         }
-        .view-once-warning-banner {
-            display: block;
-            margin-top: 8px;
-            font-size: 0.8rem;
+
+        .photo-modal-pribox.active {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .photo-modal-pribox img {
+            max-width: 90%;
+            max-height: 85%;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            color: white;
+            font-size: 36px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .modal-nav {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-nav button {
+            background: var(--primary);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: white;
             font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Loading spinner */
+        .loading-overlay {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner-pribox {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(33,158,188,0.2);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error-message-pribox {
+            background: rgba(185,45,45,0.15);
+            border-left: 3px solid var(--danger);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #f87171;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 12px; }
+            .pribox-content { padding: 18px; }
+            .photo-gallery-pribox { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+            .content-header { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="secure-card">
-        <div class="header">
-            <h1>🔒 PriBox Secure Content</h1>
-            <p>Secure sharing made simple</p>
+    <div class="pribox-card">
+        <div class="pribox-header">
+            <div class="header-brand">
+                <span class="material-icons">health_and_safety</span>
+                <h1>PriBox Secure Content</h1>
+            </div>
+            <div class="security-chip">
+                <span class="material-icons">shield</span>
+                <span>End-to-End Encrypted</span>
+            </div>
         </div>
-        <div class="content-area">
+        <div class="pribox-content">
+            <!-- Unlock Section -->
             <div id="unlockSection">
                 <div id="openAccessMessage" style="display: none;">
-                    <div class="open-icon">🔓</div>
-                    <div class="info-box" style="text-align: center;">
-                        This content is open access. Click the button below to view.
+                    <div class="info-box-pribox">
+                        <span class="material-icons">lock_open</span>
+                        <span>This content is open access. Click the button below to view securely.</span>
                     </div>
-                    <button id="viewOpenContentBtn">View Content</button>
+                    <button id="viewOpenContentBtn" class="btn-pribox btn-primary btn-full"> 
+                        <span class="material-icons">visibility</span> View Content
+                    </button>
                 </div>
                 <div id="passwordAccessMessage" style="display: none;">
-                    <div class="lock-icon">🔐</div>
-                    <div class="password-form">
-                        <div class="form-group">
-                            <label>Enter Password to Access</label>
-                            <input type="password" id="passwordInput" placeholder="Content password" autocomplete="off">
-                        </div>
-                        <button id="unlockBtn">Unlock Content</button>
+                    <div class="info-box-pribox warning-box">
+                        <span class="material-icons">lock</span>
+                        <span>Password protected content. Enter the access key to unlock.</span>
                     </div>
+                    <div class="form-group-pribox">
+                        <label class="form-label">ACCESS PASSWORD</label>
+                        <input type="password" id="passwordInput" class="pribox-input" placeholder="Enter content password" autocomplete="off">
+                    </div>
+                    <button id="unlockBtn" class="btn-pribox btn-primary btn-full">
+                        <span class="material-icons">vpn_key</span> Unlock Content
+                    </button>
                 </div>
-                <div id="errorMessage" class="error-message"></div>
+                <div id="errorMessage" class="error-message-pribox" style="display: none;"></div>
             </div>
+
+            <!-- Content Display Section -->
             <div id="contentSection" style="display: none;">
                 <div id="contentDisplay"></div>
                 <div class="button-group">
-                    <button id="backToUnlockBtn" class="btn-secondary">← Lock & Go Back</button>
+                    <button id="backToUnlockBtn" class="btn-pribox btn-secondary">
+                        <span class="material-icons">arrow_back</span> Lock & Go Back
+                    </button>
                 </div>
             </div>
-            <div class="loading" id="loading"><div class="spinner"></div></div>
-        </div>
-        <div class="footer">
-            <span>🔒 Secure sharing</span>
-            <span class="security-badge">Powered by PriBox</span>
+
+            <div id="loading" class="loading-overlay" style="display: none;">
+                <div class="spinner-pribox"></div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">Loading secure content...</div>
+            </div>
         </div>
     </div>
 </div>
-<div id="photoModal" class="photo-modal">
-    <span class="photo-modal-close">&times;</span>
+
+<!-- Photo Modal (PriBox styled) -->
+<div id="photoModal" class="photo-modal-pribox">
+    <span class="modal-close">&times;</span>
     <img id="modalImage" src="" alt="">
-    <div class="photo-modal-nav">
+    <div class="modal-nav">
         <button id="prevPhotoBtn">← Previous</button>
-        <span id="photoCounter" class="photo-counter"></span>
+        <span id="photoCounter" class="photo-counter" style="color:white; padding:0 12px;"></span>
         <button id="nextPhotoBtn">Next →</button>
     </div>
 </div>
 
 <script>
+    // Firebase config (same DB URL as original)
     const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
     const urlParams = new URLSearchParams(window.location.search);
     const linkId = urlParams.get('id');
@@ -237,7 +573,8 @@
     let countdownInterval = null;
     let isContentDisplayed = false;
     let isDestroyed = false;
-    
+
+    // Helper functions (identical crypto & fetch)
     async function hashPassword(password) {
         const encoder = new TextEncoder();
         const data = encoder.encode(password);
@@ -245,7 +582,7 @@
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
-    
+
     async function getData(path) {
         try {
             const response = await fetch(`${DB_URL}/${path}.json`);
@@ -253,18 +590,18 @@
             return await response.json();
         } catch (err) { console.error('Fetch error:', err); return null; }
     }
-    
+
     async function putData(path, data) {
         try {
             const response = await fetch(`${DB_URL}/${path}.json`, {
                 method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
             });
             return response.ok;
-        } catch (err) { console.error('PUT error:', err); return false; }
+        } catch (err) { return false; }
     }
-    
+
     async function incrementViews() {
-        if (viewIncremented) return;
+        if (viewIncremented || !linkData) return;
         try {
             const currentViews = linkData.views || 0;
             const newViews = currentViews + 1;
@@ -275,53 +612,54 @@
             if (response.ok) { linkData.views = newViews; viewIncremented = true; }
         } catch (err) { console.error("View increment error:", err); }
     }
-    
+
     async function destroyViewOnceLink() {
         if (!linkData || !linkData.viewOnce || linkData.isDestroyed) return;
         try {
             const destroyed = await putData(`shareLinks/${linkId}/isDestroyed`, true);
             if (destroyed) { linkData.isDestroyed = true; isDestroyed = true; }
-        } catch (err) { console.error("Error destroying view-once link:", err); }
+        } catch (err) { console.error("Destroy error:", err); }
     }
-    
-    // Unified timer with a single warning block (no duplicate)
+
+    // Unified timer - clean PriBox style (no duplication)
     function startViewOnceCountdown(callback) {
         let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 5) 
             ? linkData.viewOnceSeconds : 3;
         const originalSeconds = secondsLeft;
         
         const timerContainer = document.createElement('div');
-        timerContainer.className = 'timer-container';
-        // SINGLE WARNING: only one warning block inside timer container
+        timerContainer.className = 'timer-container-pribox';
         timerContainer.innerHTML = `
             <div class="timer-warning-text">⚠️ VIEW ONCE MODE ACTIVE</div>
-            <div class="timer-display countdown-active">00:${secondsLeft.toString().padStart(2, '0')}</div>
-            <div class="timer-warning-text">⏳ Content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}</div>
+            <div class="timer-display-pribox countdown-active">00:${secondsLeft.toString().padStart(2, '0')}</div>
+            <div class="timer-warning-text">⏳ This content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}</div>
         `;
         
         const contentDisplay = document.getElementById('contentDisplay');
-        // Remove any existing timer to avoid duplication (safety)
-        const existingTimer = contentDisplay.querySelector('.timer-container');
+        const existingTimer = contentDisplay.querySelector('.timer-container-pribox');
         if (existingTimer) existingTimer.remove();
-        contentDisplay.insertBefore(timerContainer, contentDisplay.firstChild);
+        // Insert at top of content display but after possible title handling? We put inside contentDisplay as first element.
+        if (contentDisplay.firstChild) contentDisplay.insertBefore(timerContainer, contentDisplay.firstChild);
+        else contentDisplay.appendChild(timerContainer);
         
         countdownInterval = setInterval(() => {
             secondsLeft--;
-            const timerDisplay = timerContainer.querySelector('.timer-display');
+            const timerDisplay = timerContainer.querySelector('.timer-display-pribox');
             if (secondsLeft <= 0) {
                 clearInterval(countdownInterval);
                 timerDisplay.textContent = "00:00";
                 timerDisplay.classList.remove('countdown-active');
-                timerContainer.style.background = 'rgba(220, 38, 38, 0.2)';
-                timerContainer.style.borderColor = '#dc2626';
-                timerContainer.querySelector('.timer-warning-text').innerHTML = '💀 Content has been permanently destroyed!';
+                timerContainer.style.borderColor = '#b92d2d';
+                timerContainer.style.background = 'rgba(185,45,45,0.15)';
+                timerContainer.querySelectorAll('.timer-warning-text')[1].innerHTML = '💀 Content has been permanently destroyed!';
                 destroyViewOnceLink().then(() => {
-                    contentDisplay.innerHTML = `
+                    const mainDisplayDiv = document.getElementById('contentDisplay');
+                    mainDisplayDiv.innerHTML = `
                         <div class="destroyed-message">
-                            <div style="font-size: 3rem; margin-bottom: 16px;">💀</div>
-                            <h3 style="margin-bottom: 12px;">Content Destroyed</h3>
-                            <p>This content was set to "View Once" mode and has been permanently destroyed after ${originalSeconds} seconds.</p>
-                            <p style="margin-top: 12px; font-size: 0.85rem;">The link is no longer valid for future access.</p>
+                            <span class="material-icons">delete_forever</span>
+                            <h3 style="margin-bottom: 12px; font-weight: 600;">Content Destroyed</h3>
+                            <p style="font-size:0.85rem;">This content was set to "View Once" mode and has been permanently destroyed after ${originalSeconds} seconds.</p>
+                            <p style="font-size:0.75rem; margin-top:12px; opacity:0.7;">The secure link is no longer valid.</p>
                         </div>
                     `;
                     const backBtn = document.getElementById('backToUnlockBtn');
@@ -332,37 +670,140 @@
                 const minutes = Math.floor(secondsLeft / 60);
                 const secs = secondsLeft % 60;
                 timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                if (secondsLeft <= 2) {
-                    timerDisplay.style.color = '#dc2626';
-                    timerDisplay.style.animation = 'pulse 0.5s infinite';
-                }
+                if (secondsLeft <= 2) timerDisplay.style.color = '#dc2626';
                 const warningMsg = timerContainer.querySelectorAll('.timer-warning-text')[1];
                 if (warningMsg) warningMsg.textContent = `⏳ Content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}`;
             }
         }, 1000);
     }
-    
+
+    // Display Content (Rich PriBox layout)
     async function displayContent() {
         if (isContentDisplayed) return;
         try {
-            const contentDisplay = document.getElementById('contentDisplay');
+            const contentDisplayDiv = document.getElementById('contentDisplay');
             const contentType = linkData.type || 'text';
             let html = '';
-            if (contentType === 'photos') html = displayPhotoContent();
-            else html = displayTextContent();
-            contentDisplay.innerHTML = html;
+            if (contentType === 'photos') html = buildPhotoHTML();
+            else html = buildTextHTML();
+            contentDisplayDiv.innerHTML = html;
             document.getElementById('unlockSection').style.display = 'none';
             document.getElementById('contentSection').style.display = 'block';
             isContentDisplayed = true;
             if (document.getElementById('passwordInput')) document.getElementById('passwordInput').value = '';
-            if (contentType === 'photos') attachPhotoClickEvents();
-            // View Once timer starts only once and there's no duplicate warning because the only warning is inside timer container.
+            
+            if (contentType === 'photos') attachPhotoEvents();
+            
             if (linkData.viewOnce && !linkData.isDestroyed) {
                 startViewOnceCountdown();
             }
-        } catch (err) { console.error("Display error:", err); showError(`Error displaying content: ${err.message}`); }
+        } catch (err) { console.error(err); showError(`Display error: ${err.message}`); }
     }
-    
+
+    function buildTextHTML() {
+        const title = linkData.title || 'Untitled';
+        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce"><span class="material-icons" style="font-size:12px;">visibility_off</span> View Once</span>' : '';
+        const accessBadge = linkData.hasPassword ? 
+            '<span class="badge-pribox badge-password"><span class="material-icons" style="font-size:12px;">lock</span> Password Protected</span>' : 
+            '<span class="badge-pribox badge-open"><span class="material-icons" style="font-size:12px;">public</span> Open Access</span>';
+        return `
+            <div class="content-display-card">
+                <div class="content-header">
+                    <div class="content-title"><span class="material-icons">description</span> ${escapeHtml(title)}</div>
+                    <div class="badge-group">${accessBadge} ${viewOnceBadge}</div>
+                </div>
+                <div class="content-body-text">${escapeHtml(linkData.content || 'No content available.').replace(/\n/g, '<br>')}</div>
+                ${buildMetaFooter()}
+            </div>
+        `;
+    }
+
+    function buildPhotoHTML() {
+        const photos = linkData.photos || [];
+        const title = linkData.title || 'Shared Photos';
+        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce"><span class="material-icons" style="font-size:12px;">visibility_off</span> View Once</span>' : '';
+        const accessBadge = linkData.hasPassword ? 
+            '<span class="badge-pribox badge-password">🔒 Protected</span>' : 
+            '<span class="badge-pribox badge-open">🔓 Open</span>';
+        if (!photos.length) {
+            return `<div class="content-display-card"><div class="content-header"><div class="content-title">📷 ${escapeHtml(title)}</div><div class="badge-group">${accessBadge} ${viewOnceBadge}</div></div><div class="content-body-text">No photos available in this share.</div>${buildMetaFooter()}</div>`;
+        }
+        currentPhotos = photos;
+        let galleryHTML = `<div class="content-display-card">
+            <div class="content-header">
+                <div class="content-title"><span class="material-icons">photo_library</span> ${escapeHtml(title)}</div>
+                <div class="badge-group"><span class="badge-pribox badge-photos">📷 ${photos.length} photo${photos.length !== 1 ? 's' : ''}</span>${accessBadge}${viewOnceBadge}</div>
+            </div>
+            <div class="photo-gallery-pribox" id="photoGalleryGrid">`;
+        photos.forEach((photo, idx) => {
+            galleryHTML += `
+                <div class="photo-card-pribox" data-photo-index="${idx}">
+                    <img src="${photo.url}" alt="${escapeHtml(photo.name)}" loading="lazy">
+                    <div class="photo-info">
+                        <div class="photo-name">${escapeHtml(photo.name)}</div>
+                        <div class="photo-meta">${photo.size ? photo.size : ''} ${photo.date ? photo.date : ''}</div>
+                    </div>
+                </div>
+            `;
+        });
+        galleryHTML += `</div>${buildMetaFooter()}</div>`;
+        return galleryHTML;
+    }
+
+    function buildMetaFooter() {
+        let meta = `<div class="meta-footer">`;
+        if (linkData.expiration) meta += `<span>⏰ Expires: ${new Date(linkData.expiration).toLocaleString()}</span>`;
+        meta += `<span>👁️ Viewed ${linkData.views || 0} time${(linkData.views || 0) !== 1 ? 's' : ''}</span>`;
+        if (linkData.ownerEmail) meta += `<span>📧 Shared by: ${escapeHtml(linkData.ownerEmail)}</span>`;
+        meta += `</div>`;
+        return meta;
+    }
+
+    function attachPhotoEvents() {
+        document.querySelectorAll('.photo-card-pribox').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const idx = parseInt(card.getAttribute('data-photo-index'));
+                if (!isNaN(idx)) openPhotoModal(idx);
+            });
+        });
+        const modal = document.getElementById('photoModal');
+        const prevBtn = document.getElementById('prevPhotoBtn');
+        const nextBtn = document.getElementById('nextPhotoBtn');
+        if (prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); navigatePhoto(-1); };
+        if (nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); navigatePhoto(1); };
+        modal.onclick = (e) => { if (e.target === modal || e.target.classList.contains('modal-close')) closePhotoModal(); };
+        document.addEventListener('keydown', (e) => {
+            if (modal.classList.contains('active')) {
+                if (e.key === 'Escape') closePhotoModal();
+                else if (e.key === 'ArrowLeft') navigatePhoto(-1);
+                else if (e.key === 'ArrowRight') navigatePhoto(1);
+            }
+        });
+    }
+
+    function openPhotoModal(idx) {
+        if (!currentPhotos.length) return;
+        currentPhotoIndex = Math.min(Math.max(0, idx), currentPhotos.length-1);
+        const photo = currentPhotos[currentPhotoIndex];
+        document.getElementById('modalImage').src = photo.url;
+        document.getElementById('photoCounter').textContent = `${currentPhotoIndex+1} / ${currentPhotos.length}`;
+        document.getElementById('photoModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function navigatePhoto(d) {
+        let newIdx = currentPhotoIndex + d;
+        if (newIdx >= 0 && newIdx < currentPhotos.length) {
+            currentPhotoIndex = newIdx;
+            const photo = currentPhotos[currentPhotoIndex];
+            document.getElementById('modalImage').src = photo.url;
+            document.getElementById('photoCounter').textContent = `${currentPhotoIndex+1} / ${currentPhotos.length}`;
+        }
+    }
+    function closePhotoModal() {
+        document.getElementById('photoModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
     function resetToUnlock() {
         if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
         document.getElementById('contentDisplay').innerHTML = '';
@@ -374,152 +815,90 @@
         errorDiv.style.display = 'none'; errorDiv.textContent = '';
         isContentDisplayed = false; isDestroyed = false;
         closePhotoModal();
-        if (linkData) {
-            if (linkData.viewOnce && linkData.isDestroyed) {
-                showError('This link has been destroyed because it was in "View Once" mode and has already been viewed.', true);
-                document.getElementById('unlockSection').style.display = 'none';
-                document.getElementById('contentSection').style.display = 'block';
-                document.getElementById('contentDisplay').innerHTML = `
-                    <div class="destroyed-message">
-                        <div style="font-size: 3rem;">💀</div>
-                        <h3>Content Destroyed</h3>
-                        <p>This content was set to "View Once" mode and has already been viewed and destroyed.</p>
-                    </div>`;
-                return;
-            }
-            showAccessMessage();
+        if (linkData && linkData.viewOnce && linkData.isDestroyed) {
+            showError('This link has been destroyed (View Once mode already consumed).', true);
+            document.getElementById('unlockSection').style.display = 'none';
+            document.getElementById('contentSection').style.display = 'block';
+            document.getElementById('contentDisplay').innerHTML = `<div class="destroyed-message"><span class="material-icons">warning</span><h3>Content Destroyed</h3><p>View Once content already viewed & destroyed.</p></div>`;
+            return;
         }
+        if (linkData) showAccessMessage();
     }
-    
+
     function showAccessMessage() {
-        const openAccessDiv = document.getElementById('openAccessMessage');
-        const passwordAccessDiv = document.getElementById('passwordAccessMessage');
+        const openDiv = document.getElementById('openAccessMessage');
+        const passDiv = document.getElementById('passwordAccessMessage');
         if (linkData.hasPassword) {
-            openAccessDiv.style.display = 'none';
-            passwordAccessDiv.style.display = 'block';
+            openDiv.style.display = 'none';
+            passDiv.style.display = 'block';
         } else {
-            openAccessDiv.style.display = 'block';
-            passwordAccessDiv.style.display = 'none';
+            openDiv.style.display = 'block';
+            passDiv.style.display = 'none';
         }
-        // Single unified view-once warning inside the info box, no duplication with timer later
+        // Single unified warning for view-once inside info box (non-duplicate)
         if (linkData.viewOnce && !linkData.isDestroyed) {
-            const infoBox = document.querySelector('#openAccessMessage .info-box, #passwordAccessMessage .info-box');
-            if (infoBox) {
-                const existing = infoBox.querySelector('.view-once-unified-warning');
-                if (!existing) {
-                    const warningSpan = document.createElement('div');
-                    warningSpan.className = 'view-once-unified-warning';
-                    warningSpan.style.marginTop = '10px';
-                    warningSpan.style.padding = '8px';
-                    warningSpan.style.background = 'rgba(245, 158, 11, 0.2)';
-                    warningSpan.style.borderRadius = '8px';
-                    warningSpan.style.fontSize = '0.8rem';
-                    warningSpan.innerHTML = '⚠️ <strong>View Once Mode:</strong> This content will be visible for only a few seconds after first view, then permanently destroyed!';
-                    infoBox.appendChild(warningSpan);
-                }
+            const container = linkData.hasPassword ? passDiv : openDiv;
+            const infoBox = container.querySelector('.info-box-pribox');
+            if (infoBox && !infoBox.querySelector('.view-once-warning-inline')) {
+                const warnSpan = document.createElement('div');
+                warnSpan.className = 'view-once-warning-inline';
+                warnSpan.style.marginTop = '8px';
+                warnSpan.style.fontSize = '0.7rem';
+                warnSpan.style.fontWeight = '500';
+                warnSpan.style.color = '#f97316';
+                warnSpan.innerHTML = '<span class="material-icons" style="font-size:14px;">timer</span> VIEW ONCE: Content self-destructs after first view.';
+                infoBox.appendChild(warnSpan);
             }
         }
     }
-    
-    function isLinkAccessible(linkData) {
-        if (!linkData) return false;
-        if (linkData.status === 'pending') return false;
-        if (linkData.isDestroyed) return false;
-        if (linkData.expiration && new Date(linkData.expiration) < new Date()) return false;
+
+    function isLinkAccessible(data) {
+        if (!data) return false;
+        if (data.status === 'pending') return false;
+        if (data.isDestroyed) return false;
+        if (data.expiration && new Date(data.expiration) < new Date()) return false;
         return true;
     }
-    
+
     async function loadLink() {
-        if (!linkId) { showError('Invalid link. No content ID provided.', true); return; }
+        if (!linkId) { showError('Invalid link: missing content ID.', true); return; }
         document.getElementById('loading').style.display = 'block';
         try {
-            const path = `shareLinks/${linkId}`;
-            linkData = await getData(path);
+            linkData = await getData(`shareLinks/${linkId}`);
             if (!linkData) { showError('Link not found or has been deleted.', true); return; }
             if (!isLinkAccessible(linkData)) {
-                if (linkData.status === 'pending') showError('This link is currently pending and not accessible.', true);
-                else if (linkData.isDestroyed) showError('This link has been destroyed and is no longer accessible.', true);
-                else if (linkData.expiration && new Date(linkData.expiration) < new Date()) showError('This link has expired.', true);
-                else showError('This link is not accessible.', true);
+                let msg = 'Link is not accessible.';
+                if (linkData.isDestroyed) msg = 'This link has been destroyed (View Once mode).';
+                else if (linkData.expiration && new Date(linkData.expiration) < new Date()) msg = 'This link has expired.';
+                showError(msg, true);
                 document.getElementById('unlockSection').style.display = 'none';
                 document.getElementById('contentSection').style.display = 'block';
-                document.getElementById('contentDisplay').innerHTML = `<div class="destroyed-message"><div style="font-size: 3rem;">⛔</div><h3>Content Not Accessible</h3><p>Link unavailable.</p></div>`;
+                document.getElementById('contentDisplay').innerHTML = `<div class="destroyed-message"><span class="material-icons">gpp_bad</span><h3>Content Unavailable</h3><p>${escapeHtml(msg)}</p></div>`;
                 document.getElementById('loading').style.display = 'none';
                 return;
             }
-            if (linkData.viewOnce && linkData.isDestroyed) {
-                showError('This link has been destroyed because it was in "View Once" mode and has already been viewed.', true);
-                document.getElementById('unlockSection').style.display = 'none';
-                document.getElementById('contentSection').style.display = 'block';
-                document.getElementById('contentDisplay').innerHTML = `<div class="destroyed-message"><div style="font-size: 3rem;">💀</div><h3>Content Destroyed</h3><p>View Once content already destroyed.</p></div>`;
-                document.getElementById('loading').style.display = 'none';
-                return;
-            }
-            if (linkData.expiration && new Date(linkData.expiration) < new Date()) { showError('This link has expired.', true); return; }
             document.getElementById('loading').style.display = 'none';
             document.getElementById('unlockSection').style.display = 'block';
             showAccessMessage();
-        } catch (err) { console.error('Load error:', err); showError(`Error loading content: ${err.message}`, true); }
+        } catch (err) { showError(`Error: ${err.message}`, true); }
         finally { document.getElementById('loading').style.display = 'none'; }
     }
-    
-    async function viewOpenContent() {
-        if (isContentDisplayed) return;
-        document.getElementById('loading').style.display = 'block';
-        try { await incrementViews(); await displayContent(); } 
-        catch (err) { showError(`Error: ${err.message}`); } 
-        finally { document.getElementById('loading').style.display = 'none'; }
-    }
-    
+
+    async function viewOpenContent() { if(isContentDisplayed) return; document.getElementById('loading').style.display='block'; try{ await incrementViews(); await displayContent(); } catch(e){ showError(e.message); } finally{ document.getElementById('loading').style.display='none'; } }
     async function verifyAndUnlock() {
-        if (isContentDisplayed) return;
-        const password = document.getElementById('passwordInput').value;
-        if (!password) { showError('Please enter the password.'); return; }
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('unlockBtn').disabled = true;
-        try {
-            const enteredHash = await hashPassword(password);
-            if (enteredHash === linkData.passwordHash) { await incrementViews(); await displayContent(); } 
-            else { showError('Incorrect password. Please try again.'); document.getElementById('passwordInput').value = ''; document.getElementById('passwordInput').focus(); }
-        } catch (err) { console.error("Unlock error:", err); showError(`Error: ${err.message}`); } 
-        finally { document.getElementById('loading').style.display = 'none'; document.getElementById('unlockBtn').disabled = false; }
+        if(isContentDisplayed) return;
+        const pwd = document.getElementById('passwordInput').value;
+        if(!pwd){ showError('Please enter the password.'); return; }
+        document.getElementById('loading').style.display='block'; document.getElementById('unlockBtn').disabled=true;
+        try{
+            const enteredHash = await hashPassword(pwd);
+            if(enteredHash === linkData.passwordHash){ await incrementViews(); await displayContent(); }
+            else{ showError('Incorrect password. Try again.'); document.getElementById('passwordInput').value=''; }
+        } catch(e){ showError(`Error: ${e.message}`); }
+        finally{ document.getElementById('loading').style.display='none'; document.getElementById('unlockBtn').disabled=false; }
     }
-    
-    function displayTextContent() {
-        const title = linkData.title || 'Untitled';
-        const viewOnceBadge = linkData.viewOnce ? '<span class="security-badge badge-viewonce">🔥 View Once</span>' : '';
-        return `<div class="content-display"><div class="content-title">📄 ${escapeHtml(title)}<div><span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}</span>${viewOnceBadge}</div></div><div class="content-body">${escapeHtml(linkData.content || 'No content available.').replace(/\n/g, '<br>')}</div>${getExpirationHTML()}${getViewCountHTML()}${getOwnerHTML()}</div>`;
-    }
-    
-    function displayPhotoContent() {
-        const photos = linkData.photos || [];
-        const title = linkData.title || 'Shared Photos';
-        const viewOnceBadge = linkData.viewOnce ? '<span class="security-badge badge-viewonce">🔥 View Once</span>' : '';
-        if (!photos.length) return `<div class="content-display"><div class="content-title">📷 ${escapeHtml(title)}<div><span class="security-badge badge-photos">📷 Photos</span><span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}</span>${viewOnceBadge}</div></div><div class="content-body">No photos available.</div>${getExpirationHTML()}${getViewCountHTML()}${getOwnerHTML()}</div>`;
-        currentPhotos = photos;
-        let galleryHTML = `<div class="content-display"><div class="content-title">📷 ${escapeHtml(title)}<div><span class="security-badge badge-photos">📷 ${photos.length} Photo${photos.length !== 1 ? 's' : ''}</span><span class="security-badge ${linkData.hasPassword ? 'badge-password' : 'badge-open'}">${linkData.hasPassword ? '🔒 Password Protected' : '🔓 Open Access'}</span>${viewOnceBadge}</div></div><div class="photo-gallery">`;
-        photos.forEach((photo, idx) => { galleryHTML += `<div class="photo-card" data-photo-index="${idx}"><img src="${photo.url}" alt="${escapeHtml(photo.name)}" loading="lazy"><div class="photo-info"><div class="photo-name">${escapeHtml(photo.name)}</div><div class="photo-meta">${photo.size || ''} ${photo.date || ''}</div>${photo.description ? `<div class="photo-meta">📝 ${escapeHtml(photo.description.substring(0,50))}</div>` : ''}</div></div>`; });
-        galleryHTML += `</div>${getExpirationHTML()}${getViewCountHTML()}${getOwnerHTML()}</div>`;
-        return galleryHTML;
-    }
-    
-    function getExpirationHTML() { return linkData.expiration ? `<div style="margin-top:20px; padding-top:10px; border-top:1px solid #e2e8f0; font-size:0.85rem; color:#64748b;">⏰ Expires: ${new Date(linkData.expiration).toLocaleString()}</div>` : ''; }
-    function getViewCountHTML() { return `<div class="view-count">👁️ Viewed ${linkData.views || 0} time${(linkData.views || 0) !== 1 ? 's' : ''}</div>`; }
-    function getOwnerHTML() { return linkData.ownerEmail ? `<div class="view-count" style="margin-top:5px;">📧 Shared by: ${escapeHtml(linkData.ownerEmail)}</div>` : ''; }
-    
-    function attachPhotoClickEvents() {
-        document.querySelectorAll('.photo-card').forEach(card => { card.addEventListener('click', () => { const idx = parseInt(card.getAttribute('data-photo-index')); if (!isNaN(idx)) openPhotoModal(idx); }); });
-        const modal = document.getElementById('photoModal'), prev = document.getElementById('prevPhotoBtn'), next = document.getElementById('nextPhotoBtn');
-        if (prev) prev.onclick = (e) => { e.stopPropagation(); navigatePhoto(-1); };
-        if (next) next.onclick = (e) => { e.stopPropagation(); navigatePhoto(1); };
-        modal.onclick = (e) => { if (e.target === modal || e.target.classList.contains('photo-modal-close')) closePhotoModal(); };
-        document.addEventListener('keydown', (e) => { if (modal.classList.contains('active')) { if (e.key === 'Escape') closePhotoModal(); else if (e.key === 'ArrowLeft') navigatePhoto(-1); else if (e.key === 'ArrowRight') navigatePhoto(1); } });
-    }
-    function openPhotoModal(idx) { if (!currentPhotos.length) return; currentPhotoIndex = Math.min(Math.max(0, idx), currentPhotos.length-1); const photo = currentPhotos[currentPhotoIndex]; document.getElementById('modalImage').src = photo.url; document.getElementById('photoCounter').textContent = `${currentPhotoIndex+1} of ${currentPhotos.length}`; document.getElementById('photoModal').classList.add('active'); document.body.style.overflow = 'hidden'; }
-    function navigatePhoto(d) { let newIdx = currentPhotoIndex + d; if (newIdx>=0 && newIdx<currentPhotos.length) { currentPhotoIndex = newIdx; const photo = currentPhotos[currentPhotoIndex]; document.getElementById('modalImage').src = photo.url; document.getElementById('photoCounter').textContent = `${currentPhotoIndex+1} of ${currentPhotos.length}`; } }
-    function closePhotoModal() { document.getElementById('photoModal').classList.remove('active'); document.body.style.overflow = ''; }
-    function showError(msg, fatal=false) { const errDiv = document.getElementById('errorMessage'); errDiv.textContent = msg; errDiv.style.display = 'block'; if(fatal){ const btn=document.getElementById('unlockBtn'); if(btn) btn.disabled=true; const viewBtn=document.getElementById('viewOpenContentBtn'); if(viewBtn) viewBtn.disabled=true; } setTimeout(()=>{ errDiv.style.display='none'; },5000); }
-    function escapeHtml(t) { if(!t) return ''; const div=document.createElement('div'); div.textContent=t; return div.innerHTML; }
+    function showError(msg, fatal=false){ const errDiv=document.getElementById('errorMessage'); errDiv.textContent=msg; errDiv.style.display='block'; if(fatal){ const btn=document.getElementById('unlockBtn'); if(btn)btn.disabled=true; const viewBtn=document.getElementById('viewOpenContentBtn'); if(viewBtn)viewBtn.disabled=true; } setTimeout(()=>{ errDiv.style.display='none'; },5000); }
+    function escapeHtml(t){ if(!t) return ''; const div=document.createElement('div'); div.textContent=t; return div.innerHTML; }
     
     document.getElementById('unlockBtn')?.addEventListener('click', verifyAndUnlock);
     document.getElementById('passwordInput')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAndUnlock(); });
