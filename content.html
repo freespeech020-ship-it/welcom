@@ -485,7 +485,7 @@
         <div class="pribox-content">
             <!-- Unlock Section -->
             <div id="unlockSection">
-                <div id="viewOnceAccessMessage" style="display: none; margin-bottom: 12px;">
+                <div id="viewOnceAccessMessage" style="display: none; margin-bottom: 4px;">
                     <div class="info-box-pribox warning-box">
                         <span>Content self-destructs after first view.</span>
                     </div>
@@ -605,7 +605,7 @@
 
     // Unified timer - clean PriBox style (no duplication)
     function startViewOnceCountdown(callback) {
-        let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 5) 
+        let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 500) 
             ? linkData.viewOnceSeconds : 3;
         const originalSeconds = secondsLeft;
         
