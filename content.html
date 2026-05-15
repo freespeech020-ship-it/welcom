@@ -605,7 +605,7 @@
 
     // Unified timer - clean PriBox style (no duplication)
     function startViewOnceCountdown(callback) {
-        let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 500) 
+        let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 60) 
             ? linkData.viewOnceSeconds : 3;
         const originalSeconds = secondsLeft;
         
@@ -684,7 +684,7 @@
 
     function buildTextHTML() {
         const title = linkData.title || 'Untitled';
-        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce"><span class="material-icons" style="font-size:12px;">visibility_off</span> View Once</span>' : '';
+        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce">View Once</span>' : '';
         const accessBadge = linkData.hasPassword ? 
             '<span class="badge-password"><span class="material-icons" style="font-size:12px;">lock</span></span>' : 
             '<span class="badge-open"><span class="material-icons" style="font-size:12px;">public</span></span>';
@@ -703,7 +703,7 @@
     function buildPhotoHTML() {
         const photos = linkData.photos || [];
         const title = linkData.title || 'Shared Photos';
-        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce"><span class="material-icons" style="font-size:12px;">visibility_off</span> View Once</span>' : '';
+        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce">View Once</span>' : '';
         const accessBadge = linkData.hasPassword ? 
             '<span class="badge-pribox badge-password">Protected</span>' : 
             '<span class="badge-pribox badge-open">Open</span>';
