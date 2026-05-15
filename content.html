@@ -813,11 +813,13 @@
         if (linkData.hasPassword) {
             openDiv.style.display = 'none';
             passDiv.style.display = 'block';
-        } else if (linkData.viewOnce && !linkData.isDestroyed) {
-            onceDiv.style.display = 'block';
         } else {
             openDiv.style.display = 'block';
             passDiv.style.display = 'none';
+        }
+
+        if (linkData.viewOnce && !linkData.isDestroyed) {
+            onceDiv.style.display = 'block';
         }
         
     }
