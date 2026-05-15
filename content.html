@@ -168,65 +168,38 @@
         }
     }
 
-    // Unified timer - clean PriBox style
-    function startViewOnceCountdown(callback) {
-        let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 60) 
-            ? linkData.viewOnceSeconds : 3;
-        const originalSeconds = secondsLeft;
-        
-        const timerContainer = document.createElement('div');
-        timerContainer.className = 'timer-container-pribox';
-        timerContainer.innerHTML = `
-            <div class="timer-warning-text">VIEW ONCE MODE ACTIVE</div>
-            <div class="timer-display-pribox countdown-active">00:${secondsLeft.toString().padStart(2, '0')}</div>
-            <div class="timer-warning-text">This content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}</div>
-        `;
-        
-        const contentDisplay = document.getElementById('contentDisplay');
-        const existingTimer = contentDisplay.querySelector('.timer-container-pribox');
-        if (existingTimer) existingTimer.remove();
-        // Insert at top of content display
-        if (contentDisplay.firstChild) contentDisplay.insertBefore(timerContainer, contentDisplay.firstChild);
-        else contentDisplay.appendChild(timerContainer);
-        
-        countdownInterval = setInterval(() => {
-            secondsLeft--;
-            const timerDisplay = timerContainer.querySelector('.timer-display-pribox');
-            if (secondsLeft <= 0) {
-                clearInterval(countdownInterval);
-                timerDisplay.textContent = "00:00";
-                timerDisplay.classList.remove('countdown-active');
-                timerContainer.style.borderColor = '#b92d2d';
-                timerContainer.style.background = 'rgba(185,45,45,0.15)';
-                timerContainer.querySelectorAll('.timer-warning-text')[1].innerHTML = '❌ Content has been permanently destroyed!';
-                destroyViewOnceLink().then(() => {
-                    const mainDisplayDiv = document.getElementById('contentDisplay');
-                    mainDisplayDiv.innerHTML = `
-                        <div class="destroyed-message">
-                            <span class="material-icons">delete_forever</span>
-                            <h3 style="margin-bottom: 12px; font-weight: 600;">Content Destroyed</h3>
-                            <p style="font-size:0.85rem;">This content was set to "View Once" mode and has been permanently destroyed after ${originalSeconds} seconds.</p>
-                            <p style="font-size:0.75rem; margin-top:12px; opacity:0.7;">The secure link is no longer valid.</p>
-                        </div>
-                    `;
-                    const backBtn = document.getElementById('backToUnlockBtn');
-                    if (backBtn) { 
-                        backBtn.disabled = true; 
-                        backBtn.style.opacity = '0.5'; 
-                        backBtn.style.cursor = 'not-allowed';
-                    }
-                });
-                if (callback) callback();
-            } else {
-                const minutes = Math.floor(secondsLeft / 60);
-                const secs = secondsLeft % 60;
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                if (secondsLeft <= 2) timerDisplay.style.color = '#dc2626';
-                const warningMsg = timerContainer.querySelectorAll('.timer-warning-text')[1];
-                if (warningMsg) warningMsg.textContent = `Content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}`;
-            }
-        }, 1000);
-    }
+function startViewOnceCountdown(callback) {
+    let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 60) 
+        ? linkData.viewOnceSeconds : 3;
+    const originalSeconds = secondsLeft;
+    
+    // NO VISUAL TIMER DISPLAY - just silent countdown in background
+    countdownInterval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft <= 0) {
+            clearInterval(countdownInterval);
+            // Destroy content exactly as before
+            destroyViewOnceLink().then(() => {
+                const mainDisplayDiv = document.getElementById('contentDisplay');
+                mainDisplayDiv.innerHTML = `
+                    <div class="destroyed-message">
+                        <span class="material-icons">delete_forever</span>
+                        <h3 style="margin-bottom: 12px; font-weight: 600;">Content Destroyed</h3>
+                        <p style="font-size:0.85rem;">This content was set to "View Once" mode and has been permanently destroyed.</p>
+                        <p style="font-size:0.75rem; margin-top:12px; opacity:0.7;">The secure link is no longer valid.</p>
+                    </div>
+                `;
+                const backBtn = document.getElementById('backToUnlockBtn');
+                if (backBtn) { 
+                    backBtn.disabled = true; 
+                    backBtn.style.opacity = '0.5'; 
+                    backBtn.style.cursor = 'not-allowed';
+                }
+            });
+            if (callback) callback();
+        }
+    }, 1000);
+}
 
     // Display Content (Rich PriBox layout)
     async function displayContent() {
@@ -342,6 +315,7 @@
         document.getElementById('photoModal').classList.add('active');
         document.body.style.overflow = 'hidden';
     }
+
     function navigatePhoto(d) {
         let newIdx = currentPhotoIndex + d;
         if (newIdx >= 0 && newIdx < currentPhotos.length) {
@@ -351,6 +325,7 @@
             document.getElementById('photoCounter').textContent = `${currentPhotoIndex+1} / ${currentPhotos.length}`;
         }
     }
+
     function closePhotoModal() {
         document.getElementById('photoModal').classList.remove('active');
         document.body.style.overflow = '';
