@@ -27,13 +27,10 @@
             <div id="unlockSection">
                 <div id="viewOnceAccessMessage" style="display: none;">
                     <div class="info-box-pribox warning-box">
-                        <span class="material-icons">visibility_off</span>
                         <span>Content self-destructs after first view. This link works only once!</span>
                     </div>
                 </div>
                 <div id="openAccessMessage" style="display: none;">
-                    <div class="info-box-pribox">
-                        <span class="material-icons">lock_open</span>
                         <span>This content is open access. Click the button below to view securely.</span>
                     </div>
                     <button id="viewOpenContentBtn" class="btn-pribox btn-primary btn-full"> 
@@ -42,7 +39,6 @@
                 </div>
                 <div id="passwordAccessMessage" style="display: none;">
                     <div class="info-box-pribox warning-box">
-                        <span class="material-icons">vpn_key</span>
                         <span>Password protected content. Enter the access key to unlock.</span>
                     </div>
                     <div class="form-group-pribox">
@@ -300,7 +296,7 @@
         let galleryHTML = `<div class="content-display-card">
             <div class="content-header">
                 <div class="content-title"><span class="material-icons">photo_library</span> ${escapeHtml(title)}</div>
-                <div class="badge-group"><span class="badge-pribox badge-photos">📸 ${photos.length} photo${photos.length !== 1 ? 's' : ''}</span>${accessBadge}${viewOnceBadge}</div>
+                <div class="badge-group"><span class="badge-pribox badge-photos">${photos.length} photo${photos.length !== 1 ? 's' : ''}</span>${accessBadge}${viewOnceBadge}</div>
             </div>
             <div class="photo-gallery-pribox" id="photoGalleryGrid">`;
         photos.forEach((photo, idx) => {
@@ -308,7 +304,6 @@
                 <div class="photo-card-pribox" data-photo-index="${idx}">
                     <img src="${photo.url}" alt="${escapeHtml(photo.name)}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Error'">
                     <div class="photo-info">
-                        <div class="photo-name">${escapeHtml(photo.name || 'Image')}</div>
                         <div class="photo-meta">${photo.size ? photo.size : ''} ${photo.date ? photo.date : ''}</div>
                     </div>
                 </div>
