@@ -27,6 +27,7 @@
             --warning: #bb780d;
             --info: #2e78a7;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --radius-sm: 4px;
             --radius-md: 8px;
             --radius-lg: 12px;
         }
@@ -147,92 +148,59 @@
             margin-bottom: 20px;
         }
 
-        /* ========== Forms ========== */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .form-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
             margin-bottom: 8px;
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: var(--text);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-input,
-        .form-select,
-        .form-textarea {
+        .pribox-input {
             width: 100%;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             padding: 6px 8px;
-            color: var(--text);
+            color: var(--text-primary);
             font-size: 0.85rem;
-            transition: var(--sidebar-transition);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', monospace;
+            transition: all 0.2s ease;
         }
 
-        .form-input.error {
-            border-color: var(--danger);
-            background: rgba(var(--danger-bg), 0.05);
-        }
-
-        .form-input:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .form-input:read-only {
-            background: rgba(255, 255, 255, 0.02);
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
-
-        .form-help {
-            font-size: 0.65rem;
-            color: var(--text);
-            margin-top: 4px;
+        .pribox-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(33, 158, 188, 0.2);
         }
 
         /* Buttons - PriBox style */
-        .btn {
+        .btn-pribox {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 4px;
             padding: 2px 6px;
-            border-radius: var(--radius-sm);
-            font-weight: 800;
+            border-radius: var(--radius-md);
+            font-weight: 600;
             font-size: 0.7rem;
             cursor: pointer;
+            transition: all 0.2s ease;
             border: none;
-            gap: 4px;
+            font-family: 'Inter', sans-serif;
         }
 
         .btn-primary {
-            background: rgba(33, 158, 188, 0.3);
-            color: var(--primary);
-            border: 1px solid rgba(33, 158, 188, 0.4);
+            background: rgba(33, 158, 188, 0.85);
+            color: white;
+            border: 1px solid rgba(33, 158, 188, 0.5);
         }
 
         .btn-secondary {
             background: rgba(108, 117, 125, 0.3);
-            color: var(--secondary);
-            border: 1px solid rgba(108, 117, 125, 0.4);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
         }
 
         .btn-warning {
@@ -534,7 +502,7 @@
                         <span class="material-icons">lock_open</span>
                         <span>This content is open access. Click the button below to view securely.</span>
                     </div>
-                    <button id="viewOpenContentBtn" class="btn btn-primary btn-full"> 
+                    <button id="viewOpenContentBtn" class="btn-pribox btn-primary btn-full"> 
                         <span class="material-icons">visibility</span> View Content
                     </button>
                 </div>
@@ -545,9 +513,9 @@
                     </div>
                     <div class="form-group-pribox">
                         <label class="form-label">ACCESS PASSWORD</label>
-                        <input type="password" id="passwordInput" class="form-input" placeholder="Enter content password" autocomplete="off">
+                        <input type="password" id="passwordInput" class="pribox-input" placeholder="Enter content password" autocomplete="off">
                     </div>
-                    <button id="unlockBtn" class="btn btn-primary btn-full">
+                    <button id="unlockBtn" class="btn-pribox btn-primary btn-full">
                         <span class="material-icons">vpn_key</span> Unlock Content
                     </button>
                 </div>
@@ -558,7 +526,7 @@
             <div id="contentSection" style="display: none;">
                 <div id="contentDisplay"></div>
                 <div class="button-group">
-                    <button id="backToUnlockBtn" class="btn btn-secondary">
+                    <button id="backToUnlockBtn" class="btn-pribox btn-secondary">
                         <span class="material-icons">arrow_back</span> Lock & Go Back
                     </button>
                 </div>
