@@ -119,9 +119,9 @@
         .info-box-pribox {
             background: rgba(46, 120, 167, 0.12);
             border-left: 3px solid var(--primary);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-sm);
             padding: 6px 10px;
-            margin-bottom: 12x;
+            margin-bottom: 24px;
             font-size: 0.85rem;
             color: var(--text-primary);
             display: flex;
@@ -163,7 +163,6 @@
 
         .pribox-input:focus {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(33, 158, 188, 0.2);
         }
 
         /* Buttons - PriBox style */
@@ -449,10 +448,10 @@
         .error-message-pribox {
             background: rgba(185,45,45,0.15);
             border-left: 3px solid var(--danger);
-            padding: 12px 16px;
-            border-radius: var(--radius-md);
-            margin-top: 16px;
-            font-size: 0.8rem;
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            margin-top: 12px;
+            font-size: 0.85rem;
             color: #f87171;
         }
 
@@ -505,6 +504,11 @@
                     <button id="unlockBtn" class="btn-pribox btn-primary btn-full">
                         <span class="material-icons">vpn_key</span> Unlock Content
                     </button>
+                </div>
+                <div id="viewOnceAccessMessage" style="display: none;">
+                    <div class="info-box-pribox warning-box">
+                        <span>Content self-destructs after first view.</span>
+                    </div>
                 </div>
                 <div id="errorMessage" class="error-message-pribox" style="display: none;"></div>
             </div>
@@ -805,6 +809,7 @@
     function showAccessMessage() {
         const openDiv = document.getElementById('openAccessMessage');
         const passDiv = document.getElementById('passwordAccessMessage');
+        const onceDiv = document.getElementById('viewOnceAccessMessage');
         if (linkData.hasPassword) {
             openDiv.style.display = 'none';
             passDiv.style.display = 'block';
@@ -814,18 +819,7 @@
         }
         // Single unified warning for view-once inside info box (non-duplicate)
         if (linkData.viewOnce && !linkData.isDestroyed) {
-            const container = linkData.hasPassword ? passDiv : openDiv;
-            const infoBox = container.querySelector('.info-box-pribox');
-            if (infoBox && !infoBox.querySelector('.view-once-warning-inline')) {
-                const warnSpan = document.createElement('div');
-                warnSpan.className = 'view-once-warning-inline';
-                warnSpan.style.marginTop = '8px';
-                warnSpan.style.fontSize = '0.7rem';
-                warnSpan.style.fontWeight = '500';
-                warnSpan.style.color = '#f97316';
-                warnSpan.innerHTML = 'VIEW ONCE: Content self-destructs after first view.';
-                infoBox.appendChild(warnSpan);
-            }
+            onceDiv.style.display = 'block';
         }
     }
 
