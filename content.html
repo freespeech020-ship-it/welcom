@@ -485,7 +485,7 @@
         <div class="pribox-content">
             <!-- Unlock Section -->
             <div id="unlockSection">
-                <div id="viewOnceAccessMessage" style="display: none; margin-bottom: 4px;">
+                <div id="viewOnceAccessMessage" style="display: none;">
                     <div class="info-box-pribox warning-box">
                         <span>Content self-destructs after first view.</span>
                     </div>
@@ -722,7 +722,6 @@
                 <div class="photo-card-pribox" data-photo-index="${idx}">
                     <img src="${photo.url}" alt="${escapeHtml(photo.name)}" loading="lazy">
                     <div class="photo-info">
-                        <div class="photo-name">${escapeHtml(photo.name)}</div>
                         <div class="photo-meta">${photo.size ? photo.size : ''} ${photo.date ? photo.date : ''}</div>
                     </div>
                 </div>
