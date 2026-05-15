@@ -25,23 +25,12 @@
         <div class="pribox-content">
             <!-- Unlock Section -->
             <div id="unlockSection">
-                <div id="viewOnceAccessMessage" style="display: none;">
-                    <div class="info-box-pribox warning-box">
-                        <span>Content self-destructs after first view. This link works only once!</span>
-                    </div>
-                </div>
                 <div id="openAccessMessage" style="display: none;">
-                    <div class="info-box-pribox">
-                        <span>This content is open access. Click the button below to view securely.</span>
-                    </div>
                     <button id="viewOpenContentBtn" class="btn-pribox btn-primary btn-full"> 
                         <span class="material-icons">visibility</span> View Content
                     </button>
                 </div>
                 <div id="passwordAccessMessage" style="display: none;">
-                    <div class="info-box-pribox warning-box">
-                        <span>Password protected content. Enter the access key to unlock.</span>
-                    </div>
                     <div class="form-group-pribox">
                         <label class="form-label">ACCESS PASSWORD</label>
                         <input type="password" id="passwordInput" class="pribox-input" placeholder="Enter content password" autocomplete="off">
@@ -393,19 +382,12 @@
     function showAccessMessage() {
         const openDiv = document.getElementById('openAccessMessage');
         const passDiv = document.getElementById('passwordAccessMessage');
-        const onceDiv = document.getElementById('viewOnceAccessMessage');
         if (linkData.hasPassword) {
             openDiv.style.display = 'none';
             passDiv.style.display = 'block';
         } else {
             openDiv.style.display = 'block';
             passDiv.style.display = 'none';
-        }
-
-        if (linkData.viewOnce && !linkData.isDestroyed) {
-            onceDiv.style.display = 'block';
-        } else {
-            onceDiv.style.display = 'none';
         }
     }
 

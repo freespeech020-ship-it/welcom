@@ -109,25 +109,6 @@ body {
     padding: 12px;
 }
 
-/* Info box - PriBox style */
-.info-box-pribox {
-    background: rgba(46, 120, 167, 0.12);
-    border-left: 3px solid var(--primary);
-    border-radius: var(--radius-sm);
-    padding: 6px 10px;
-    margin-bottom: 24px;
-    font-size: 0.85rem;
-    color: var(--text-primary);
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-}
-
-.warning-box {
-    background: rgba(187, 120, 13, 0.12);
-    border-left-color: var(--warning);
-}
-
 /* Form styling - matches PriBox inputs */
 .form-group-pribox {
     margin-bottom: 12px;
@@ -535,7 +516,7 @@ body {
 /* Loading spinner */
 .loading-overlay {
     text-align: center;
-    padding: 40px;
+    padding: 20px;
 }
 .spinner-pribox {
     width: 40px;
@@ -561,5 +542,4 @@ body {
 .button-group {
     display: flex;
     gap: 12px;
-    margin-top: 12px;
 }
