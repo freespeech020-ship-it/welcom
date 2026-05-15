@@ -147,69 +147,92 @@
             margin-bottom: 20px;
         }
 
-        .form-label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
+        /* ========== Forms ========== */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
             margin-bottom: 8px;
         }
 
-        .pribox-input {
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
             width: 100%;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 12px 16px;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            font-family: 'Inter', monospace;
-            transition: all 0.2s ease;
-        }
-
-        .pribox-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(33, 158, 188, 0.2);
-        }
-
-        /* Buttons - PriBox style */
-        .btn-pribox {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
+            border-radius: var(--radius-sm);
+            padding: 6px 8px;
+            color: var(--text);
+            font-size: 0.85rem;
+            transition: var(--sidebar-transition);
             font-family: 'Inter', sans-serif;
         }
 
-        .btn-primary {
-            background: rgba(33, 158, 188, 0.85);
-            color: white;
-            border: 1px solid rgba(33, 158, 188, 0.5);
+        .form-input.error {
+            border-color: var(--danger);
+            background: rgba(var(--danger-bg), 0.05);
         }
 
-        .btn-primary:hover {
-            background: var(--primary);
-            transform: translateY(-1px);
+        .form-input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .form-input:read-only {
+            background: rgba(255, 255, 255, 0.02);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-help {
+            font-size: 0.65rem;
+            color: var(--text);
+            margin-top: 4px;
+        }
+
+        /* Buttons - PriBox style */
+        .btn {
+            align-items: center;
+            justify-content: center;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: none;
+            gap: 4px;
+        }
+
+        .btn-primary {
+            background: rgba(33, 158, 188, 0.3);
+            color: var(--primary);
+            border: 1px solid rgba(33, 158, 188, 0.4);
         }
 
         .btn-secondary {
             background: rgba(108, 117, 125, 0.3);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(108, 117, 125, 0.5);
+            color: var(--secondary);
+            border: 1px solid rgba(108, 117, 125, 0.4);
         }
 
         .btn-warning {
@@ -511,7 +534,7 @@
                         <span class="material-icons">lock_open</span>
                         <span>This content is open access. Click the button below to view securely.</span>
                     </div>
-                    <button id="viewOpenContentBtn" class="btn-pribox btn-primary btn-full"> 
+                    <button id="viewOpenContentBtn" class="btn btn-primary btn-full"> 
                         <span class="material-icons">visibility</span> View Content
                     </button>
                 </div>
@@ -522,9 +545,9 @@
                     </div>
                     <div class="form-group-pribox">
                         <label class="form-label">ACCESS PASSWORD</label>
-                        <input type="password" id="passwordInput" class="pribox-input" placeholder="Enter content password" autocomplete="off">
+                        <input type="password" id="passwordInput" class="form-input" placeholder="Enter content password" autocomplete="off">
                     </div>
-                    <button id="unlockBtn" class="btn-pribox btn-primary btn-full">
+                    <button id="unlockBtn" class="btn btn-primary btn-full">
                         <span class="material-icons">vpn_key</span> Unlock Content
                     </button>
                 </div>
@@ -535,7 +558,7 @@
             <div id="contentSection" style="display: none;">
                 <div id="contentDisplay"></div>
                 <div class="button-group">
-                    <button id="backToUnlockBtn" class="btn-pribox btn-secondary">
+                    <button id="backToUnlockBtn" class="btn btn-secondary">
                         <span class="material-icons">arrow_back</span> Lock & Go Back
                     </button>
                 </div>
@@ -630,9 +653,9 @@
         const timerContainer = document.createElement('div');
         timerContainer.className = 'timer-container-pribox';
         timerContainer.innerHTML = `
-            <div class="timer-warning-text">⚠️ VIEW ONCE MODE ACTIVE</div>
+            <div class="timer-warning-text">VIEW ONCE MODE ACTIVE</div>
             <div class="timer-display-pribox countdown-active">00:${secondsLeft.toString().padStart(2, '0')}</div>
-            <div class="timer-warning-text">⏳ This content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}</div>
+            <div class="timer-warning-text">This content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}</div>
         `;
         
         const contentDisplay = document.getElementById('contentDisplay');
@@ -651,7 +674,7 @@
                 timerDisplay.classList.remove('countdown-active');
                 timerContainer.style.borderColor = '#b92d2d';
                 timerContainer.style.background = 'rgba(185,45,45,0.15)';
-                timerContainer.querySelectorAll('.timer-warning-text')[1].innerHTML = '💀 Content has been permanently destroyed!';
+                timerContainer.querySelectorAll('.timer-warning-text')[1].innerHTML = 'Content has been permanently destroyed!';
                 destroyViewOnceLink().then(() => {
                     const mainDisplayDiv = document.getElementById('contentDisplay');
                     mainDisplayDiv.innerHTML = `
@@ -672,7 +695,7 @@
                 timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                 if (secondsLeft <= 2) timerDisplay.style.color = '#dc2626';
                 const warningMsg = timerContainer.querySelectorAll('.timer-warning-text')[1];
-                if (warningMsg) warningMsg.textContent = `⏳ Content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}`;
+                if (warningMsg) warningMsg.textContent = `Content will be permanently destroyed after ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}`;
             }
         }, 1000);
     }
@@ -723,8 +746,8 @@
         const title = linkData.title || 'Shared Photos';
         const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce"><span class="material-icons" style="font-size:12px;">visibility_off</span> View Once</span>' : '';
         const accessBadge = linkData.hasPassword ? 
-            '<span class="badge-pribox badge-password">🔒 Protected</span>' : 
-            '<span class="badge-pribox badge-open">🔓 Open</span>';
+            '<span class="badge-pribox badge-password">Protected</span>' : 
+            '<span class="badge-pribox badge-open">Open</span>';
         if (!photos.length) {
             return `<div class="content-display-card"><div class="content-header"><div class="content-title">📷 ${escapeHtml(title)}</div><div class="badge-group">${accessBadge} ${viewOnceBadge}</div></div><div class="content-body-text">No photos available in this share.</div>${buildMetaFooter()}</div>`;
         }
@@ -732,7 +755,7 @@
         let galleryHTML = `<div class="content-display-card">
             <div class="content-header">
                 <div class="content-title"><span class="material-icons">photo_library</span> ${escapeHtml(title)}</div>
-                <div class="badge-group"><span class="badge-pribox badge-photos">📷 ${photos.length} photo${photos.length !== 1 ? 's' : ''}</span>${accessBadge}${viewOnceBadge}</div>
+                <div class="badge-group"><span class="badge-pribox badge-photos">${photos.length} photo${photos.length !== 1 ? 's' : ''}</span>${accessBadge}${viewOnceBadge}</div>
             </div>
             <div class="photo-gallery-pribox" id="photoGalleryGrid">`;
         photos.forEach((photo, idx) => {
@@ -752,9 +775,8 @@
 
     function buildMetaFooter() {
         let meta = `<div class="meta-footer">`;
-        if (linkData.expiration) meta += `<span>⏰ Expires: ${new Date(linkData.expiration).toLocaleString()}</span>`;
-        meta += `<span>👁️ Viewed ${linkData.views || 0} time${(linkData.views || 0) !== 1 ? 's' : ''}</span>`;
-        if (linkData.ownerEmail) meta += `<span>📧 Shared by: ${escapeHtml(linkData.ownerEmail)}</span>`;
+        if (linkData.expiration) meta += `<span>Expires: ${new Date(linkData.expiration).toLocaleString()}</span>`;
+        meta += `<span>Viewed ${linkData.views || 0} time${(linkData.views || 0) !== 1 ? 's' : ''}</span>`;
         meta += `</div>`;
         return meta;
     }
