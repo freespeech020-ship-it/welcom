@@ -3,471 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>PriBox Secure Content - View Once</title>
+    <title>PriBox Secure Share</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --body-bg: #252a2c;
-            --card-bg: #2d3436;
-            --border: #3c484a;
-            --text-primary: #CCCCCC;
-            --text-secondary: #8a9499;
-            --primary: #219EBC;
-            --primary-light: #8ECAE6;
-            --success: #308671;
-            --danger: #b92d2d;
-            --warning: #bb780d;
-            --info: #2e78a7;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--body-bg);
-            min-height: 100vh;
-            padding: 16px;
-            color: var(--text-primary);
-        }
-
-        .container {
-            max-width: 1280px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        /* PriBox Style Card */
-        .pribox-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            animation: fadeInUp 0.4s ease-out;
-            box-shadow: var(--shadow);
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Header - matches PriBox navbar aesthetic */
-        .pribox-header {
-            background: rgba(33, 158, 188, 0.08);
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-brand .material-icons {
-            font-size: 28px;
-            color: var(--primary);
-        }
-
-        .header-brand h1 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.3px;
-        }
-
-        .security-chip {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(33, 158, 188, 0.15);
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--primary-light);
-        }
-
-        .security-chip .material-icons {
-            font-size: 16px;
-        }
-
-        /* Content Area */
-        .pribox-content {
-            padding: 12px;
-        }
-
-        /* Info box - PriBox style */
-        .info-box-pribox {
-            background: rgba(46, 120, 167, 0.12);
-            border-left: 3px solid var(--primary);
-            border-radius: var(--radius-sm);
-            padding: 6px 10px;
-            margin-bottom: 24px;
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .warning-box {
-            background: rgba(187, 120, 13, 0.12);
-            border-left-color: var(--warning);
-        }
-
-        /* Form styling - matches PriBox inputs */
-        .form-group-pribox {
-            margin-bottom: 12px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .pribox-input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 6px 8px;
-            color: var(--text-primary);
-            font-size: 0.85rem;
-            font-family: 'Inter', monospace;
-            transition: all 0.2s ease;
-        }
-
-        .pribox-input:focus {
-            outline: none;
-        }
-
-        /* Buttons - PriBox style */
-        .btn-pribox {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 2px 6px;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-primary {
-            background: rgba(33, 158, 188, 0.85);
-            color: white;
-            border: 1px solid rgba(33, 158, 188, 0.5);
-        }
-
-        .btn-secondary {
-            background: rgba(108, 117, 125, 0.3);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-warning {
-            background: rgba(187, 120, 13, 0.3);
-            color: var(--warning);
-            border: 1px solid rgba(187, 120, 13, 0.4);
-        }
-
-        .btn-full {
-            width: 100%;
-        }
-
-        /* Content display - PriBox cards */
-        .content-display-card {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
-        .content-header {
-            padding: 18px 22px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            background: rgba(33, 158, 188, 0.04);
-        }
-
-        .content-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .badge-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .badge-pribox {
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid var(--border);
-        }
-
-        .badge-open { color: var(--success); border: none;}
-        .badge-password { color: var(--warning); border: none;}
-        .badge-photos { color: var(--primary); border: none;}
-        .badge-viewonce { color: #f97316; border: none;}
-
-        .content-body-text {
-            padding: 22px;
-            line-height: 1.6;
-            font-size: 0.9rem;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        /* Photo gallery - PriBox grid */
-        .photo-gallery-pribox {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 16px;
-            padding: 22px;
-        }
-
-        .photo-card-pribox {
-            background: rgba(0,0,0,0.3);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid var(--border);
-        }
-
-        .photo-card-pribox:hover {
-            transform: translateY(-3px);
-            border-color: var(--primary);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-
-        .photo-card-pribox img {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            display: block;
-        }
-
-        .photo-info {
-            padding: 10px 12px;
-        }
-
-        .photo-name {
-            font-size: 0.75rem;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 4px;
-        }
-
-        .photo-meta {
-            font-size: 0.65rem;
-            color: var(--text-secondary);
-        }
-
-        /* Meta footer */
-        .meta-footer {
-            padding: 16px 22px;
-            border-top: 1px solid var(--border);
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            background: rgba(0,0,0,0.1);
-        }
-
-        /* Timer - single clean component */
-        .timer-container-pribox {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.35);
-            border-radius: var(--radius-md);
-            padding: 14px 20px;
-            margin-bottom: 24px;
-            text-align: center;
-        }
-
-        .timer-warning-text {
-            color: var(--warning);
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .timer-display-pribox {
-            font-size: 2rem;
-            font-weight: 700;
-            font-family: monospace;
-            color: #f59e0b;
-            margin: 8px 0;
-        }
-
-        .countdown-active {
-            animation: pulseSoft 1s infinite;
-        }
-
-        @keyframes pulseSoft {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-
-        .destroyed-message {
-            text-align: center;
-            padding: 12px;
-            margin: 12px;
-        }
-
-        .destroyed-message .material-icons {
-            font-size: 32px;
-            color: var(--danger);
-            margin-bottom: 12px;
-        }
-
-        /* Modal for photos - PriBox dark theme */
-        .photo-modal-pribox {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(8px);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .photo-modal-pribox.active {
-            display: flex;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .photo-modal-pribox img {
-            max-width: 90%;
-            max-height: 85%;
-            object-fit: contain;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 24px;
-            right: 32px;
-            color: white;
-            font-size: 36px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .modal-nav {
-            position: absolute;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 16px;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 60px;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-nav button {
-            background: var(--primary);
-            border: none;
-            padding: 8px 18px;
-            border-radius: 40px;
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        /* Loading spinner */
-        .loading-overlay {
-            text-align: center;
-            padding: 40px;
-        }
-        .spinner-pribox {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(33,158,188,0.2);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 12px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .error-message-pribox {
-            background: rgba(185,45,45,0.15);
-            border-left: 3px solid var(--danger);
-            padding: 6px 10px;
-            border-radius: var(--radius-sm);
-            margin-top: 12px;
-            font-size: 0.85rem;
-            color: #f87171;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        @media (max-width: 640px) {
-            body { padding: 12px; }
-            .pribox-content { padding: 18px; }
-            .photo-gallery-pribox { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
-            .content-header { flex-direction: column; align-items: flex-start; }
-        }
-    </style>
+    <!-- External CSS Stylesheet -->
+    <link rel="stylesheet" href="content-styles.css">
 </head>
 <body>
 <div class="container">
@@ -475,7 +15,7 @@
         <div class="pribox-header">
             <div class="header-brand">
                 <span class="material-icons">health_and_safety</span>
-                <h1>PriBox Secure Content</h1>
+                <h1>PriBox Secure Share</h1>
             </div>
             <div class="security-chip">
                 <span class="material-icons">shield</span>
@@ -487,11 +27,13 @@
             <div id="unlockSection">
                 <div id="viewOnceAccessMessage" style="display: none;">
                     <div class="info-box-pribox warning-box">
-                        <span>Content self-destructs after first view.</span>
+                        <span class="material-icons">visibility_off</span>
+                        <span>Content self-destructs after first view. This link works only once!</span>
                     </div>
                 </div>
                 <div id="openAccessMessage" style="display: none;">
                     <div class="info-box-pribox">
+                        <span class="material-icons">lock_open</span>
                         <span>This content is open access. Click the button below to view securely.</span>
                     </div>
                     <button id="viewOpenContentBtn" class="btn-pribox btn-primary btn-full"> 
@@ -500,6 +42,7 @@
                 </div>
                 <div id="passwordAccessMessage" style="display: none;">
                     <div class="info-box-pribox warning-box">
+                        <span class="material-icons">vpn_key</span>
                         <span>Password protected content. Enter the access key to unlock.</span>
                     </div>
                     <div class="form-group-pribox">
@@ -529,6 +72,22 @@
             </div>
         </div>
     </div>
+
+    <!-- APK Download Footer Section -->
+    <div class="apk-footer">
+        <div class="apk-footer-content">
+            <div class="apk-info">
+                <span class="material-icons">android</span>
+                <div class="apk-text">
+                    <h4>PriBox Mobile App</h4>
+                    <p>Secure sharing • End-to-end encryption • Self-destructing content</p>
+                </div>
+            </div>
+            <a href="#" id="apkDownloadLink" class="apk-download-btn" download>
+                <span class="material-icons">download</span> Download PriBox APK
+            </a>
+        </div>
+    </div>
 </div>
 
 <!-- Photo Modal (PriBox styled) -->
@@ -537,12 +96,13 @@
     <img id="modalImage" src="" alt="">
     <div class="modal-nav">
         <button id="prevPhotoBtn">← Previous</button>
-        <span id="photoCounter" class="photo-counter" style="color:white; padding:0 12px;"></span>
+        <span id="photoCounter" class="photo-counter"></span>
         <button id="nextPhotoBtn">Next →</button>
     </div>
 </div>
 
 <script>
+    // ==================== PRIBOX SECURE SHARE - MAIN APPLICATION ====================
     // Firebase config (same DB URL as original)
     const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
     const urlParams = new URLSearchParams(window.location.search);
@@ -556,7 +116,7 @@
     let isContentDisplayed = false;
     let isDestroyed = false;
 
-    // Helper functions (identical crypto & fetch)
+    // Helper functions (crypto & fetch)
     async function hashPassword(password) {
         const encoder = new TextEncoder();
         const data = encoder.encode(password);
@@ -570,16 +130,23 @@
             const response = await fetch(`${DB_URL}/${path}.json`);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return await response.json();
-        } catch (err) { console.error('Fetch error:', err); return null; }
+        } catch (err) { 
+            console.error('Fetch error:', err); 
+            return null; 
+        }
     }
 
     async function putData(path, data) {
         try {
             const response = await fetch(`${DB_URL}/${path}.json`, {
-                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+                method: 'PUT', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(data)
             });
             return response.ok;
-        } catch (err) { return false; }
+        } catch (err) { 
+            return false; 
+        }
     }
 
     async function incrementViews() {
@@ -589,21 +156,33 @@
             const newViews = currentViews + 1;
             const path = `shareLinks/${linkId}/views`;
             const response = await fetch(`${DB_URL}/${path}.json`, {
-                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newViews)
+                method: 'PUT', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(newViews)
             });
-            if (response.ok) { linkData.views = newViews; viewIncremented = true; }
-        } catch (err) { console.error("View increment error:", err); }
+            if (response.ok) { 
+                linkData.views = newViews; 
+                viewIncremented = true; 
+            }
+        } catch (err) { 
+            console.error("View increment error:", err); 
+        }
     }
 
     async function destroyViewOnceLink() {
         if (!linkData || !linkData.viewOnce || linkData.isDestroyed) return;
         try {
             const destroyed = await putData(`shareLinks/${linkId}/isDestroyed`, true);
-            if (destroyed) { linkData.isDestroyed = true; isDestroyed = true; }
-        } catch (err) { console.error("Destroy error:", err); }
+            if (destroyed) { 
+                linkData.isDestroyed = true; 
+                isDestroyed = true; 
+            }
+        } catch (err) { 
+            console.error("Destroy error:", err); 
+        }
     }
 
-    // Unified timer - clean PriBox style (no duplication)
+    // Unified timer - clean PriBox style
     function startViewOnceCountdown(callback) {
         let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 60) 
             ? linkData.viewOnceSeconds : 3;
@@ -620,7 +199,7 @@
         const contentDisplay = document.getElementById('contentDisplay');
         const existingTimer = contentDisplay.querySelector('.timer-container-pribox');
         if (existingTimer) existingTimer.remove();
-        // Insert at top of content display but after possible title handling? We put inside contentDisplay as first element.
+        // Insert at top of content display
         if (contentDisplay.firstChild) contentDisplay.insertBefore(timerContainer, contentDisplay.firstChild);
         else contentDisplay.appendChild(timerContainer);
         
@@ -633,7 +212,7 @@
                 timerDisplay.classList.remove('countdown-active');
                 timerContainer.style.borderColor = '#b92d2d';
                 timerContainer.style.background = 'rgba(185,45,45,0.15)';
-                timerContainer.querySelectorAll('.timer-warning-text')[1].innerHTML = 'Content has been permanently destroyed!';
+                timerContainer.querySelectorAll('.timer-warning-text')[1].innerHTML = '❌ Content has been permanently destroyed!';
                 destroyViewOnceLink().then(() => {
                     const mainDisplayDiv = document.getElementById('contentDisplay');
                     mainDisplayDiv.innerHTML = `
@@ -645,7 +224,11 @@
                         </div>
                     `;
                     const backBtn = document.getElementById('backToUnlockBtn');
-                    if (backBtn) { backBtn.disabled = true; backBtn.style.opacity = '0.5'; }
+                    if (backBtn) { 
+                        backBtn.disabled = true; 
+                        backBtn.style.opacity = '0.5'; 
+                        backBtn.style.cursor = 'not-allowed';
+                    }
                 });
                 if (callback) callback();
             } else {
@@ -679,15 +262,18 @@
             if (linkData.viewOnce && !linkData.isDestroyed) {
                 startViewOnceCountdown();
             }
-        } catch (err) { console.error(err); showError(`Display error: ${err.message}`); }
+        } catch (err) { 
+            console.error(err); 
+            showError(`Display error: ${err.message}`); 
+        }
     }
 
     function buildTextHTML() {
         const title = linkData.title || 'Untitled';
-        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce">View Once</span>' : '';
+        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce"><span class="material-icons" style="font-size:12px;">visibility_off</span> View Once</span>' : '';
         const accessBadge = linkData.hasPassword ? 
-            '<span class="badge-password"><span class="material-icons" style="font-size:12px;">lock</span></span>' : 
-            '<span class="badge-open"><span class="material-icons" style="font-size:12px;">public</span></span>';
+            '<span class="badge-pribox badge-password"><span class="material-icons" style="font-size:12px;">lock</span> Protected</span>' : 
+            '<span class="badge-pribox badge-open"><span class="material-icons" style="font-size:12px;">public</span> Open Access</span>';
         return `
             <div class="content-display-card">
                 <div class="content-header">
@@ -703,7 +289,7 @@
     function buildPhotoHTML() {
         const photos = linkData.photos || [];
         const title = linkData.title || 'Shared Photos';
-        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce">View Once</span>' : '';
+        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce"><span class="material-icons" style="font-size:12px;">visibility_off</span> View Once</span>' : '';
         const accessBadge = linkData.hasPassword ? 
             '<span class="badge-pribox badge-password">Protected</span>' : 
             '<span class="badge-pribox badge-open">Open</span>';
@@ -714,14 +300,15 @@
         let galleryHTML = `<div class="content-display-card">
             <div class="content-header">
                 <div class="content-title"><span class="material-icons">photo_library</span> ${escapeHtml(title)}</div>
-                <div class="badge-group"><span class="badge-pribox badge-photos">${photos.length} photo${photos.length !== 1 ? 's' : ''}</span>${accessBadge}${viewOnceBadge}</div>
+                <div class="badge-group"><span class="badge-pribox badge-photos">📸 ${photos.length} photo${photos.length !== 1 ? 's' : ''}</span>${accessBadge}${viewOnceBadge}</div>
             </div>
             <div class="photo-gallery-pribox" id="photoGalleryGrid">`;
         photos.forEach((photo, idx) => {
             galleryHTML += `
                 <div class="photo-card-pribox" data-photo-index="${idx}">
-                    <img src="${photo.url}" alt="${escapeHtml(photo.name)}" loading="lazy">
+                    <img src="${photo.url}" alt="${escapeHtml(photo.name)}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Error'">
                     <div class="photo-info">
+                        <div class="photo-name">${escapeHtml(photo.name || 'Image')}</div>
                         <div class="photo-meta">${photo.size ? photo.size : ''} ${photo.date ? photo.date : ''}</div>
                     </div>
                 </div>
@@ -800,6 +387,8 @@
             document.getElementById('unlockSection').style.display = 'none';
             document.getElementById('contentSection').style.display = 'block';
             document.getElementById('contentDisplay').innerHTML = `<div class="destroyed-message"><span class="material-icons">warning</span><h3>Content Destroyed</h3><p>View Once content already viewed & destroyed.</p></div>`;
+            const backBtn = document.getElementById('backToUnlockBtn');
+            if(backBtn) backBtn.disabled = true;
             return;
         }
         if (linkData) showAccessMessage();
@@ -819,8 +408,9 @@
 
         if (linkData.viewOnce && !linkData.isDestroyed) {
             onceDiv.style.display = 'block';
+        } else {
+            onceDiv.style.display = 'none';
         }
-        
     }
 
     function isLinkAccessible(data) {
@@ -851,31 +441,90 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('unlockSection').style.display = 'block';
             showAccessMessage();
-        } catch (err) { showError(`Error: ${err.message}`, true); }
+        } catch (err) { 
+            showError(`Error: ${err.message}`, true);
+        }
         finally { document.getElementById('loading').style.display = 'none'; }
     }
 
-    async function viewOpenContent() { if(isContentDisplayed) return; document.getElementById('loading').style.display='block'; try{ await incrementViews(); await displayContent(); } catch(e){ showError(e.message); } finally{ document.getElementById('loading').style.display='none'; } }
+    async function viewOpenContent() { 
+        if(isContentDisplayed) return; 
+        document.getElementById('loading').style.display='block'; 
+        try{ 
+            await incrementViews(); 
+            await displayContent(); 
+        } catch(e){ 
+            showError(e.message); 
+        } finally{ 
+            document.getElementById('loading').style.display='none'; 
+        } 
+    }
+    
     async function verifyAndUnlock() {
         if(isContentDisplayed) return;
         const pwd = document.getElementById('passwordInput').value;
         if(!pwd){ showError('Please enter the password.'); return; }
-        document.getElementById('loading').style.display='block'; document.getElementById('unlockBtn').disabled=true;
+        document.getElementById('loading').style.display='block'; 
+        document.getElementById('unlockBtn').disabled=true;
         try{
             const enteredHash = await hashPassword(pwd);
-            if(enteredHash === linkData.passwordHash){ await incrementViews(); await displayContent(); }
-            else{ showError('Incorrect password. Try again.'); document.getElementById('passwordInput').value=''; }
-        } catch(e){ showError(`Error: ${e.message}`); }
-        finally{ document.getElementById('loading').style.display='none'; document.getElementById('unlockBtn').disabled=false; }
+            if(enteredHash === linkData.passwordHash){ 
+                await incrementViews(); 
+                await displayContent(); 
+            }
+            else{ 
+                showError('Incorrect password. Try again.'); 
+                document.getElementById('passwordInput').value=''; 
+            }
+        } catch(e){ 
+            showError(`Error: ${e.message}`); 
+        }
+        finally{ 
+            document.getElementById('loading').style.display='none'; 
+            document.getElementById('unlockBtn').disabled=false; 
+        }
     }
-    function showError(msg, fatal=false){ const errDiv=document.getElementById('errorMessage'); errDiv.textContent=msg; errDiv.style.display='block'; if(fatal){ const btn=document.getElementById('unlockBtn'); if(btn)btn.disabled=true; const viewBtn=document.getElementById('viewOpenContentBtn'); if(viewBtn)viewBtn.disabled=true; } setTimeout(()=>{ errDiv.style.display='none'; },5000); }
-    function escapeHtml(t){ if(!t) return ''; const div=document.createElement('div'); div.textContent=t; return div.innerHTML; }
     
+    function showError(msg, fatal=false){ 
+        const errDiv=document.getElementById('errorMessage'); 
+        errDiv.textContent=msg; 
+        errDiv.style.display='block'; 
+        if(fatal){ 
+            const btn=document.getElementById('unlockBtn'); 
+            if(btn)btn.disabled=true; 
+            const viewBtn=document.getElementById('viewOpenContentBtn'); 
+            if(viewBtn)viewBtn.disabled=true; 
+        } 
+        setTimeout(()=>{ 
+            errDiv.style.display='none'; 
+        },5000); 
+    }
+    
+    function escapeHtml(t){ 
+        if(!t) return ''; 
+        const div=document.createElement('div'); 
+        div.textContent=t; 
+        return div.innerHTML; 
+    }
+    
+    // APK Download functionality - direct file from same directory
+    function setupApkDownload() {
+        const apkLink = document.getElementById('apkDownloadLink');
+        
+        // Since pribox.apk is in the same directory, just set the href directly
+        apkLink.href = 'PriBox.apk';
+        apkLink.download = 'PriBox.apk';
+    }
+    
+    // Event binding
     document.getElementById('unlockBtn')?.addEventListener('click', verifyAndUnlock);
     document.getElementById('passwordInput')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAndUnlock(); });
     document.getElementById('viewOpenContentBtn')?.addEventListener('click', viewOpenContent);
     document.getElementById('backToUnlockBtn')?.addEventListener('click', resetToUnlock);
+    
+    // Initialize
     loadLink();
+    setupApkDownload();
 </script>
 </body>
 </html>
