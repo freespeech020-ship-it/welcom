@@ -112,7 +112,7 @@
 
         /* Content Area */
         .pribox-content {
-            padding: 28px;
+            padding: 16px;
         }
 
         /* Info box - PriBox style */
@@ -120,8 +120,8 @@
             background: rgba(46, 120, 167, 0.12);
             border-left: 3px solid var(--primary);
             border-radius: var(--radius-md);
-            padding: 14px 18px;
-            margin-bottom: 24px;
+            padding: 6px 10px;
+            margin-bottom: 12x;
             font-size: 0.85rem;
             color: var(--text-primary);
             display: flex;
@@ -129,23 +129,14 @@
             gap: 12px;
         }
 
-        .info-box-pribox .material-icons {
-            color: var(--primary);
-            font-size: 20px;
-        }
-
         .warning-box {
             background: rgba(187, 120, 13, 0.12);
             border-left-color: var(--warning);
         }
 
-        .warning-box .material-icons {
-            color: var(--warning);
-        }
-
         /* Form styling - matches PriBox inputs */
         .form-group-pribox {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .form-label {
@@ -182,7 +173,7 @@
             justify-content: center;
             gap: 4px;
             padding: 2px 6px;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-sm);
             font-weight: 600;
             font-size: 0.7rem;
             cursor: pointer;
@@ -255,10 +246,10 @@
             border: 1px solid var(--border);
         }
 
-        .badge-open { color: var(--success); border-color: rgba(48, 134, 113, 0.4); background: rgba(48,134,113,0.1); }
-        .badge-password { color: var(--warning); border-color: rgba(187,120,13,0.4); background: rgba(187,120,13,0.1); }
-        .badge-photos { color: var(--primary); border-color: rgba(33,158,188,0.4); background: rgba(33,158,188,0.1); }
-        .badge-viewonce { color: #f97316; border-color: rgba(249,115,22,0.4); background: rgba(249,115,22,0.1); }
+        .badge-open { color: var(--success); border: none;}
+        .badge-password { color: var(--warning); border: none;}
+        .badge-photos { color: var(--primary); border: none;}
+        .badge-viewonce { color: #f97316; border: none;}
 
         .content-body-text {
             padding: 22px;
@@ -367,16 +358,14 @@
 
         .destroyed-message {
             text-align: center;
-            padding: 40px 24px;
-            background: rgba(185, 45, 45, 0.1);
-            border-radius: var(--radius-md);
-            margin: 20px;
+            padding: 12px;
+            margin: 12px;
         }
 
         .destroyed-message .material-icons {
-            font-size: 48px;
+            font-size: 32px;
             color: var(--danger);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         /* Modal for photos - PriBox dark theme */
@@ -472,13 +461,6 @@
             gap: 12px;
             margin-top: 24px;
         }
-
-        @media (max-width: 640px) {
-            body { padding: 12px; }
-            .pribox-content { padding: 18px; }
-            .photo-gallery-pribox { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
-            .content-header { flex-direction: column; align-items: flex-start; }
-        }
     </style>
 </head>
 <body>
@@ -499,7 +481,6 @@
             <div id="unlockSection">
                 <div id="openAccessMessage" style="display: none;">
                     <div class="info-box-pribox">
-                        <span class="material-icons">lock_open</span>
                         <span>This content is open access. Click the button below to view securely.</span>
                     </div>
                     <button id="viewOpenContentBtn" class="btn-pribox btn-primary btn-full"> 
@@ -507,7 +488,6 @@
                     </button>
                 </div>
                 <div id="passwordAccessMessage" style="display: none;">
-                    <div class="info-box-pribox warning-box">
                         <span class="material-icons">lock</span>
                         <span>Password protected content. Enter the access key to unlock.</span>
                     </div>
@@ -695,8 +675,8 @@
         const title = linkData.title || 'Untitled';
         const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce"><span class="material-icons" style="font-size:12px;">visibility_off</span> View Once</span>' : '';
         const accessBadge = linkData.hasPassword ? 
-            '<span class="badge-pribox badge-password"><span class="material-icons" style="font-size:12px;">lock</span> Password Protected</span>' : 
-            '<span class="badge-pribox badge-open"><span class="material-icons" style="font-size:12px;">public</span> Open Access</span>';
+            '<span class="badge-password"><span class="material-icons" style="font-size:12px;">lock</span></span>' : 
+            '<span class="badge-open"><span class="material-icons" style="font-size:12px;">public</span></span>';
         return `
             <div class="content-display-card">
                 <div class="content-header">
@@ -836,7 +816,7 @@
                 warnSpan.style.fontSize = '0.7rem';
                 warnSpan.style.fontWeight = '500';
                 warnSpan.style.color = '#f97316';
-                warnSpan.innerHTML = '<span class="material-icons" style="font-size:14px;">timer</span> VIEW ONCE: Content self-destructs after first view.';
+                warnSpan.innerHTML = 'VIEW ONCE: Content self-destructs after first view.';
                 infoBox.appendChild(warnSpan);
             }
         }
