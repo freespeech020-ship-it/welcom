@@ -270,10 +270,10 @@
 
     function buildTextHTML() {
         const title = linkData.title || 'Untitled';
-        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce"><span class="material-icons" style="font-size:12px;">visibility_off</span> View Once</span>' : '';
+        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce">View Once</span>' : '';
         const accessBadge = linkData.hasPassword ? 
-            '<span class="badge-pribox badge-password"><span class="material-icons" style="font-size:12px;">lock</span> Protected</span>' : 
-            '<span class="badge-pribox badge-open"><span class="material-icons" style="font-size:12px;">public</span> Open Access</span>';
+            '<span class="badge-pribox badge-password">Protected</span>' : 
+            '<span class="badge-pribox badge-open">Open Access</span>';
         return `
             <div class="content-display-card">
                 <div class="content-header">
@@ -289,12 +289,12 @@
     function buildPhotoHTML() {
         const photos = linkData.photos || [];
         const title = linkData.title || 'Shared Photos';
-        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce"><span class="material-icons" style="font-size:12px;">visibility_off</span> View Once</span>' : '';
+        const viewOnceBadge = linkData.viewOnce ? '<span class="badge-pribox badge-viewonce">View Once</span>' : '';
         const accessBadge = linkData.hasPassword ? 
             '<span class="badge-pribox badge-password">Protected</span>' : 
             '<span class="badge-pribox badge-open">Open</span>';
         if (!photos.length) {
-            return `<div class="content-display-card"><div class="content-header"><div class="content-title">📷 ${escapeHtml(title)}</div><div class="badge-group">${accessBadge} ${viewOnceBadge}</div></div><div class="content-body-text">No photos available in this share.</div>${buildMetaFooter()}</div>`;
+            return `<div class="content-display-card"><div class="content-header"><div class="content-title">${escapeHtml(title)}</div><div class="badge-group">${accessBadge} ${viewOnceBadge}</div></div><div class="content-body-text">No photos available in this share.</div>${buildMetaFooter()}</div>`;
         }
         currentPhotos = photos;
         let galleryHTML = `<div class="content-display-card">
