@@ -88,15 +88,9 @@
 </div>
 
 <script>
-    // ==================== PRIBOX SECURE SHARE - WITH SEPARATE SHARE DATABASE ====================
-    
-    // Main database URL (only for configuration)
-    const MAIN_DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
-    
-    // Will be set after discovery
-    let SHARE_DB_URL = null;
-    let shareDB = null;
-    
+    // ==================== PRIBOX SECURE SHARE - MAIN APPLICATION ====================
+    // SHARE DATABASE URL (separate from main auth database)
+    const SHARE_DB_URL = "https://db00-4775a-default-rtdb.europe-west1.firebasedatabase.app/";
     const urlParams = new URLSearchParams(window.location.search);
     const linkId = urlParams.get('id');
     
@@ -108,34 +102,17 @@
     let isContentDisplayed = false;
     let isDestroyed = false;
 
-    // ========== STEP 1: DISCOVER SHARE DATABASE URL FROM MAIN DATABASE ==========
-    
-    async function discoverShareDatabaseUrl() {
-        try {
-            console.log('Discovering share database URL from main database...');
-            const response = await fetch(`${MAIN_DB_URL}/shareURL/url.json`);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            
-            if (data) {
-                SHARE_DB_URL = data;
-                console.log('Share database URL discovered:', SHARE_DB_URL);
-                return SHARE_DB_URL;
-            } else {
-                throw new Error('No share database URL found in main database');
-            }
-        } catch (error) {
-            console.error('Error discovering share database URL:', error);
-            throw new Error('Unable to locate share database. Please try again later.');
-        }
+    // Helper functions (crypto & fetch)
+    async function hashPassword(password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // ========== STEP 2: ALL DATABASE OPERATIONS USE THE DISCOVERED SHARE DB ==========
-    
+    // Get data from SHARE database
     async function getData(path) {
-        if (!SHARE_DB_URL) {
-            await discoverShareDatabaseUrl();
-        }
         try {
             const response = await fetch(`${SHARE_DB_URL}/${path}.json`);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -146,10 +123,8 @@
         }
     }
 
+    // Put data to SHARE database
     async function putData(path, data) {
-        if (!SHARE_DB_URL) {
-            await discoverShareDatabaseUrl();
-        }
         try {
             const response = await fetch(`${SHARE_DB_URL}/${path}.json`, {
                 method: 'PUT', 
@@ -158,15 +133,13 @@
             });
             return response.ok;
         } catch (err) { 
-            console.error('Put error:', err);
+            console.error('PUT error:', err);
             return false; 
         }
     }
 
+    // Patch/Update data to SHARE database
     async function patchData(path, data) {
-        if (!SHARE_DB_URL) {
-            await discoverShareDatabaseUrl();
-        }
         try {
             const response = await fetch(`${SHARE_DB_URL}/${path}.json`, {
                 method: 'PATCH', 
@@ -175,43 +148,37 @@
             });
             return response.ok;
         } catch (err) { 
-            console.error('Patch error:', err);
+            console.error('PATCH error:', err);
             return false; 
         }
     }
 
-    // ========== HELPER FUNCTIONS ==========
-    
-    async function hashPassword(password) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
+    // Increment view count in SHARE database
     async function incrementViews() {
         if (viewIncremented || !linkData) return;
         try {
             const currentViews = linkData.views || 0;
             const newViews = currentViews + 1;
-            const success = await putData(`shareLinks/${linkId}/views`, newViews);
+            const success = await patchData(`shareLinks/${linkId}`, { views: newViews });
             if (success) { 
                 linkData.views = newViews; 
                 viewIncremented = true; 
+                console.log('View count incremented to:', newViews);
             }
         } catch (err) { 
             console.error("View increment error:", err); 
         }
     }
 
+    // Destroy view-once link in SHARE database
     async function destroyViewOnceLink() {
         if (!linkData || !linkData.viewOnce || linkData.isDestroyed) return;
         try {
-            const destroyed = await putData(`shareLinks/${linkId}/isDestroyed`, true);
+            const destroyed = await patchData(`shareLinks/${linkId}`, { isDestroyed: true });
             if (destroyed) { 
                 linkData.isDestroyed = true; 
                 isDestroyed = true; 
+                console.log('View-once link destroyed');
             }
         } catch (err) { 
             console.error("Destroy error:", err); 
@@ -223,10 +190,12 @@
         let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 60) 
             ? linkData.viewOnceSeconds : 3;
         
+        // NO VISUAL TIMER DISPLAY - just silent countdown in background
         countdownInterval = setInterval(() => {
             secondsLeft--;
             if (secondsLeft <= 0) {
                 clearInterval(countdownInterval);
+                // Destroy content exactly as before
                 destroyViewOnceLink().then(() => {
                     const mainDisplayDiv = document.getElementById('contentDisplay');
                     mainDisplayDiv.innerHTML = `
@@ -423,26 +392,30 @@
     }
 
     async function loadLink() {
-        if (!linkId) { showError('Invalid link: missing content ID.', true); return; }
+        if (!linkId) { 
+            showError('Invalid link: missing content ID.', true); 
+            document.getElementById('loading').style.display = 'none';
+            return; 
+        }
         
         document.getElementById('loading').style.display = 'block';
         
         try {
-            // STEP 1: Discover share database URL
-            await discoverShareDatabaseUrl();
-            
-            // STEP 2: Load link data from share database
+            // Fetch from SHARE database
             linkData = await getData(`shareLinks/${linkId}`);
             
             if (!linkData) { 
                 showError('Link not found or has been deleted.', true); 
+                document.getElementById('loading').style.display = 'none';
                 return; 
             }
             
             if (!isLinkAccessible(linkData)) {
                 let msg = 'Link is not accessible.';
                 if (linkData.isDestroyed) msg = 'This link has been destroyed (View Once mode).';
+                else if (linkData.status === 'pending') msg = 'This link has been paused by the owner.';
                 else if (linkData.expiration && new Date(linkData.expiration) < new Date()) msg = 'This link has expired.';
+                
                 showError(msg, true);
                 document.getElementById('unlockSection').style.display = 'none';
                 document.getElementById('contentSection').style.display = 'block';
@@ -457,10 +430,8 @@
             
         } catch (err) { 
             console.error('Load error:', err);
-            showError(`Unable to load content: ${err.message}`, true);
-        }
-        finally { 
-            document.getElementById('loading').style.display = 'none'; 
+            showError(`Error loading content: ${err.message}`, true);
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
@@ -471,6 +442,7 @@
             await incrementViews(); 
             await displayContent(); 
         } catch(e){ 
+            console.error('View open content error:', e);
             showError(e.message); 
         } finally{ 
             document.getElementById('loading').style.display='none'; 
@@ -481,8 +453,10 @@
         if(isContentDisplayed) return;
         const pwd = document.getElementById('passwordInput').value;
         if(!pwd){ showError('Please enter the password.'); return; }
+        
         document.getElementById('loading').style.display='block'; 
         document.getElementById('unlockBtn').disabled=true;
+        
         try{
             const enteredHash = await hashPassword(pwd);
             if(enteredHash === linkData.passwordHash){ 
@@ -494,6 +468,7 @@
                 document.getElementById('passwordInput').value=''; 
             }
         } catch(e){ 
+            console.error('Verify error:', e);
             showError(`Error: ${e.message}`); 
         }
         finally{ 
@@ -503,30 +478,32 @@
     }
     
     function showError(msg, fatal=false){ 
-        const errDiv=document.getElementById('errorMessage'); 
-        errDiv.textContent=msg; 
-        errDiv.style.display='block'; 
+        const errDiv = document.getElementById('errorMessage'); 
+        errDiv.textContent = msg; 
+        errDiv.style.display = 'block'; 
         if(fatal){ 
-            const btn=document.getElementById('unlockBtn'); 
-            if(btn)btn.disabled=true; 
-            const viewBtn=document.getElementById('viewOpenContentBtn'); 
-            if(viewBtn)viewBtn.disabled=true; 
+            const btn = document.getElementById('unlockBtn'); 
+            if(btn) btn.disabled = true; 
+            const viewBtn = document.getElementById('viewOpenContentBtn'); 
+            if(viewBtn) viewBtn.disabled = true; 
         } 
         setTimeout(()=>{ 
-            errDiv.style.display='none'; 
-        },5000); 
+            errDiv.style.display = 'none'; 
+        }, 5000); 
     }
     
     function escapeHtml(t){ 
         if(!t) return ''; 
-        const div=document.createElement('div'); 
-        div.textContent=t; 
+        const div = document.createElement('div'); 
+        div.textContent = t; 
         return div.innerHTML; 
     }
     
-    // APK Download functionality
+    // APK Download functionality - direct file from same directory
     function setupApkDownload() {
         const apkLink = document.getElementById('apkDownloadLink');
+        
+        // Since pribox.apk is in the same directory, just set the href directly
         apkLink.href = 'PriBox.apk';
         apkLink.download = 'PriBox.apk';
     }
