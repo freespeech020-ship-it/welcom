@@ -89,8 +89,8 @@
 
 <script>
     // ==================== PRIBOX SECURE SHARE - MAIN APPLICATION ====================
-    // SHARE DATABASE URL (separate from main auth database)
-    const SHARE_DB_URL = "https://db00-4775a-default-rtdb.europe-west1.firebasedatabase.app/";
+    // Firebase config (same DB URL as original)
+    const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
     const urlParams = new URLSearchParams(window.location.search);
     const linkId = urlParams.get('id');
     
@@ -111,10 +111,9 @@
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // Get data from SHARE database
     async function getData(path) {
         try {
-            const response = await fetch(`${SHARE_DB_URL}/${path}.json`);
+            const response = await fetch(`${DB_URL}/${path}.json`);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return await response.json();
         } catch (err) { 
@@ -123,62 +122,46 @@
         }
     }
 
-    // Put data to SHARE database
     async function putData(path, data) {
         try {
-            const response = await fetch(`${SHARE_DB_URL}/${path}.json`, {
+            const response = await fetch(`${DB_URL}/${path}.json`, {
                 method: 'PUT', 
                 headers: { 'Content-Type': 'application/json' }, 
                 body: JSON.stringify(data)
             });
             return response.ok;
         } catch (err) { 
-            console.error('PUT error:', err);
             return false; 
         }
     }
 
-    // Patch/Update data to SHARE database
-    async function patchData(path, data) {
-        try {
-            const response = await fetch(`${SHARE_DB_URL}/${path}.json`, {
-                method: 'PATCH', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(data)
-            });
-            return response.ok;
-        } catch (err) { 
-            console.error('PATCH error:', err);
-            return false; 
-        }
-    }
-
-    // Increment view count in SHARE database
     async function incrementViews() {
         if (viewIncremented || !linkData) return;
         try {
             const currentViews = linkData.views || 0;
             const newViews = currentViews + 1;
-            const success = await patchData(`shareLinks/${linkId}`, { views: newViews });
-            if (success) { 
+            const path = `shareLinks/${linkId}/views`;
+            const response = await fetch(`${DB_URL}/${path}.json`, {
+                method: 'PUT', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(newViews)
+            });
+            if (response.ok) { 
                 linkData.views = newViews; 
                 viewIncremented = true; 
-                console.log('View count incremented to:', newViews);
             }
         } catch (err) { 
             console.error("View increment error:", err); 
         }
     }
 
-    // Destroy view-once link in SHARE database
     async function destroyViewOnceLink() {
         if (!linkData || !linkData.viewOnce || linkData.isDestroyed) return;
         try {
-            const destroyed = await patchData(`shareLinks/${linkId}`, { isDestroyed: true });
+            const destroyed = await putData(`shareLinks/${linkId}/isDestroyed`, true);
             if (destroyed) { 
                 linkData.isDestroyed = true; 
                 isDestroyed = true; 
-                console.log('View-once link destroyed');
             }
         } catch (err) { 
             console.error("Destroy error:", err); 
@@ -189,6 +172,7 @@
     function startViewOnceCountdown(callback) {
         let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 60) 
             ? linkData.viewOnceSeconds : 3;
+        const originalSeconds = secondsLeft;
         
         // NO VISUAL TIMER DISPLAY - just silent countdown in background
         countdownInterval = setInterval(() => {
@@ -392,30 +376,15 @@
     }
 
     async function loadLink() {
-        if (!linkId) { 
-            showError('Invalid link: missing content ID.', true); 
-            document.getElementById('loading').style.display = 'none';
-            return; 
-        }
-        
+        if (!linkId) { showError('Invalid link: missing content ID.', true); return; }
         document.getElementById('loading').style.display = 'block';
-        
         try {
-            // Fetch from SHARE database
             linkData = await getData(`shareLinks/${linkId}`);
-            
-            if (!linkData) { 
-                showError('Link not found or has been deleted.', true); 
-                document.getElementById('loading').style.display = 'none';
-                return; 
-            }
-            
+            if (!linkData) { showError('Link not found or has been deleted.', true); return; }
             if (!isLinkAccessible(linkData)) {
                 let msg = 'Link is not accessible.';
                 if (linkData.isDestroyed) msg = 'This link has been destroyed (View Once mode).';
-                else if (linkData.status === 'pending') msg = 'This link has been paused by the owner.';
                 else if (linkData.expiration && new Date(linkData.expiration) < new Date()) msg = 'This link has expired.';
-                
                 showError(msg, true);
                 document.getElementById('unlockSection').style.display = 'none';
                 document.getElementById('contentSection').style.display = 'block';
@@ -423,16 +392,13 @@
                 document.getElementById('loading').style.display = 'none';
                 return;
             }
-            
             document.getElementById('loading').style.display = 'none';
             document.getElementById('unlockSection').style.display = 'block';
             showAccessMessage();
-            
         } catch (err) { 
-            console.error('Load error:', err);
-            showError(`Error loading content: ${err.message}`, true);
-            document.getElementById('loading').style.display = 'none';
+            showError(`Error: ${err.message}`, true);
         }
+        finally { document.getElementById('loading').style.display = 'none'; }
     }
 
     async function viewOpenContent() { 
@@ -442,7 +408,6 @@
             await incrementViews(); 
             await displayContent(); 
         } catch(e){ 
-            console.error('View open content error:', e);
             showError(e.message); 
         } finally{ 
             document.getElementById('loading').style.display='none'; 
@@ -453,10 +418,8 @@
         if(isContentDisplayed) return;
         const pwd = document.getElementById('passwordInput').value;
         if(!pwd){ showError('Please enter the password.'); return; }
-        
         document.getElementById('loading').style.display='block'; 
         document.getElementById('unlockBtn').disabled=true;
-        
         try{
             const enteredHash = await hashPassword(pwd);
             if(enteredHash === linkData.passwordHash){ 
@@ -468,7 +431,6 @@
                 document.getElementById('passwordInput').value=''; 
             }
         } catch(e){ 
-            console.error('Verify error:', e);
             showError(`Error: ${e.message}`); 
         }
         finally{ 
@@ -478,24 +440,24 @@
     }
     
     function showError(msg, fatal=false){ 
-        const errDiv = document.getElementById('errorMessage'); 
-        errDiv.textContent = msg; 
-        errDiv.style.display = 'block'; 
+        const errDiv=document.getElementById('errorMessage'); 
+        errDiv.textContent=msg; 
+        errDiv.style.display='block'; 
         if(fatal){ 
-            const btn = document.getElementById('unlockBtn'); 
-            if(btn) btn.disabled = true; 
-            const viewBtn = document.getElementById('viewOpenContentBtn'); 
-            if(viewBtn) viewBtn.disabled = true; 
+            const btn=document.getElementById('unlockBtn'); 
+            if(btn)btn.disabled=true; 
+            const viewBtn=document.getElementById('viewOpenContentBtn'); 
+            if(viewBtn)viewBtn.disabled=true; 
         } 
         setTimeout(()=>{ 
-            errDiv.style.display = 'none'; 
-        }, 5000); 
+            errDiv.style.display='none'; 
+        },5000); 
     }
     
     function escapeHtml(t){ 
         if(!t) return ''; 
-        const div = document.createElement('div'); 
-        div.textContent = t; 
+        const div=document.createElement('div'); 
+        div.textContent=t; 
         return div.innerHTML; 
     }
     
