@@ -88,9 +88,15 @@
 </div>
 
 <script>
-    // ==================== PRIBOX SECURE SHARE - MAIN APPLICATION ====================
-    // Firebase config (same DB URL as original)
-    const DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
+    // ==================== PRIBOX SECURE SHARE - WITH SEPARATE SHARE DATABASE ====================
+    
+    // Main database URL (only for configuration)
+    const MAIN_DB_URL = "https://admin-efcf4-default-rtdb.europe-west1.firebasedatabase.app";
+    
+    // Will be set after discovery
+    let SHARE_DB_URL = null;
+    let shareDB = null;
+    
     const urlParams = new URLSearchParams(window.location.search);
     const linkId = urlParams.get('id');
     
@@ -102,18 +108,36 @@
     let isContentDisplayed = false;
     let isDestroyed = false;
 
-    // Helper functions (crypto & fetch)
-    async function hashPassword(password) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    // ========== STEP 1: DISCOVER SHARE DATABASE URL FROM MAIN DATABASE ==========
+    
+    async function discoverShareDatabaseUrl() {
+        try {
+            console.log('Discovering share database URL from main database...');
+            const response = await fetch(`${MAIN_DB_URL}/shareURL/url.json`);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            
+            if (data) {
+                SHARE_DB_URL = data;
+                console.log('Share database URL discovered:', SHARE_DB_URL);
+                return SHARE_DB_URL;
+            } else {
+                throw new Error('No share database URL found in main database');
+            }
+        } catch (error) {
+            console.error('Error discovering share database URL:', error);
+            throw new Error('Unable to locate share database. Please try again later.');
+        }
     }
 
+    // ========== STEP 2: ALL DATABASE OPERATIONS USE THE DISCOVERED SHARE DB ==========
+    
     async function getData(path) {
+        if (!SHARE_DB_URL) {
+            await discoverShareDatabaseUrl();
+        }
         try {
-            const response = await fetch(`${DB_URL}/${path}.json`);
+            const response = await fetch(`${SHARE_DB_URL}/${path}.json`);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return await response.json();
         } catch (err) { 
@@ -123,16 +147,47 @@
     }
 
     async function putData(path, data) {
+        if (!SHARE_DB_URL) {
+            await discoverShareDatabaseUrl();
+        }
         try {
-            const response = await fetch(`${DB_URL}/${path}.json`, {
+            const response = await fetch(`${SHARE_DB_URL}/${path}.json`, {
                 method: 'PUT', 
                 headers: { 'Content-Type': 'application/json' }, 
                 body: JSON.stringify(data)
             });
             return response.ok;
         } catch (err) { 
+            console.error('Put error:', err);
             return false; 
         }
+    }
+
+    async function patchData(path, data) {
+        if (!SHARE_DB_URL) {
+            await discoverShareDatabaseUrl();
+        }
+        try {
+            const response = await fetch(`${SHARE_DB_URL}/${path}.json`, {
+                method: 'PATCH', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(data)
+            });
+            return response.ok;
+        } catch (err) { 
+            console.error('Patch error:', err);
+            return false; 
+        }
+    }
+
+    // ========== HELPER FUNCTIONS ==========
+    
+    async function hashPassword(password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
     async function incrementViews() {
@@ -140,13 +195,8 @@
         try {
             const currentViews = linkData.views || 0;
             const newViews = currentViews + 1;
-            const path = `shareLinks/${linkId}/views`;
-            const response = await fetch(`${DB_URL}/${path}.json`, {
-                method: 'PUT', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(newViews)
-            });
-            if (response.ok) { 
+            const success = await putData(`shareLinks/${linkId}/views`, newViews);
+            if (success) { 
                 linkData.views = newViews; 
                 viewIncremented = true; 
             }
@@ -172,14 +222,11 @@
     function startViewOnceCountdown(callback) {
         let secondsLeft = (linkData.viewOnceSeconds && linkData.viewOnceSeconds >= 1 && linkData.viewOnceSeconds <= 60) 
             ? linkData.viewOnceSeconds : 3;
-        const originalSeconds = secondsLeft;
         
-        // NO VISUAL TIMER DISPLAY - just silent countdown in background
         countdownInterval = setInterval(() => {
             secondsLeft--;
             if (secondsLeft <= 0) {
                 clearInterval(countdownInterval);
-                // Destroy content exactly as before
                 destroyViewOnceLink().then(() => {
                     const mainDisplayDiv = document.getElementById('contentDisplay');
                     mainDisplayDiv.innerHTML = `
@@ -377,10 +424,21 @@
 
     async function loadLink() {
         if (!linkId) { showError('Invalid link: missing content ID.', true); return; }
+        
         document.getElementById('loading').style.display = 'block';
+        
         try {
+            // STEP 1: Discover share database URL
+            await discoverShareDatabaseUrl();
+            
+            // STEP 2: Load link data from share database
             linkData = await getData(`shareLinks/${linkId}`);
-            if (!linkData) { showError('Link not found or has been deleted.', true); return; }
+            
+            if (!linkData) { 
+                showError('Link not found or has been deleted.', true); 
+                return; 
+            }
+            
             if (!isLinkAccessible(linkData)) {
                 let msg = 'Link is not accessible.';
                 if (linkData.isDestroyed) msg = 'This link has been destroyed (View Once mode).';
@@ -392,13 +450,18 @@
                 document.getElementById('loading').style.display = 'none';
                 return;
             }
+            
             document.getElementById('loading').style.display = 'none';
             document.getElementById('unlockSection').style.display = 'block';
             showAccessMessage();
+            
         } catch (err) { 
-            showError(`Error: ${err.message}`, true);
+            console.error('Load error:', err);
+            showError(`Unable to load content: ${err.message}`, true);
         }
-        finally { document.getElementById('loading').style.display = 'none'; }
+        finally { 
+            document.getElementById('loading').style.display = 'none'; 
+        }
     }
 
     async function viewOpenContent() { 
@@ -461,11 +524,9 @@
         return div.innerHTML; 
     }
     
-    // APK Download functionality - direct file from same directory
+    // APK Download functionality
     function setupApkDownload() {
         const apkLink = document.getElementById('apkDownloadLink');
-        
-        // Since pribox.apk is in the same directory, just set the href directly
         apkLink.href = 'PriBox.apk';
         apkLink.download = 'PriBox.apk';
     }
